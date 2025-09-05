@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDocumentTypes</key>
+	<array>
+		<dict/>
+	</array>
+	<key>UTExportedTypeDeclarations</key>
+	<array>
+		<dict/>
+	</array>
+    <key>NSCameraUsageDescription</key>
+       <string>We need access to the camera to capture photos and videos.</string>
+
+       <key>NSPhotoLibraryUsageDescription</key>
+       <string>We need access to your photo library to select photos.</string>
+
+       <key>NSLocationWhenInUseUsageDescription</key>
+       <string>We need your location to provide location-based features.</string>
+	
+       <!-- Allow opening files in place -->
+       <key>LSSupportsOpeningDocumentsInPlace</key>
+       <true/>	
+
+	<key>UIFileSharingEnabled</key>
+       <true/>	
+	
+
+
+</dict>
+</plist>

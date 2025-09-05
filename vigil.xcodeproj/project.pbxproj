@@ -1,0 +1,608 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		AF254CB12E5EF60E0082FF87 /* SwiftSoup in Frameworks */ = {isa = PBXBuildFile; productRef = AF254CB02E5EF60E0082FF87 /* SwiftSoup */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		AF254C862E5EE3880082FF87 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AF254C6D2E5EE3850082FF87 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AF254C742E5EE3860082FF87;
+			remoteInfo = vigil;
+		};
+		AF254C902E5EE3880082FF87 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AF254C6D2E5EE3850082FF87 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AF254C742E5EE3860082FF87;
+			remoteInfo = vigil;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		AF254C752E5EE3860082FF87 /* vigil.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = vigil.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		AF254C852E5EE3880082FF87 /* vigilTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = vigilTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		AF254C8F2E5EE3880082FF87 /* vigilUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = vigilUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		AF254CB32E5EF8FB0082FF87 /* Exceptions for "vigil" folder in "vigil" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = AF254C742E5EE3860082FF87 /* vigil */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		AF254C772E5EE3860082FF87 /* vigil */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				AF254CB32E5EF8FB0082FF87 /* Exceptions for "vigil" folder in "vigil" target */,
+			);
+			path = vigil;
+			sourceTree = "<group>";
+		};
+		AF254C882E5EE3880082FF87 /* vigilTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = vigilTests;
+			sourceTree = "<group>";
+		};
+		AF254C922E5EE3880082FF87 /* vigilUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = vigilUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		AF254C722E5EE3860082FF87 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AF254CB12E5EF60E0082FF87 /* SwiftSoup in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AF254C822E5EE3880082FF87 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AF254C8C2E5EE3880082FF87 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		AF254C6C2E5EE3850082FF87 = {
+			isa = PBXGroup;
+			children = (
+				AF254C772E5EE3860082FF87 /* vigil */,
+				AF254C882E5EE3880082FF87 /* vigilTests */,
+				AF254C922E5EE3880082FF87 /* vigilUITests */,
+				AF254C762E5EE3860082FF87 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		AF254C762E5EE3860082FF87 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				AF254C752E5EE3860082FF87 /* vigil.app */,
+				AF254C852E5EE3880082FF87 /* vigilTests.xctest */,
+				AF254C8F2E5EE3880082FF87 /* vigilUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		AF254C742E5EE3860082FF87 /* vigil */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AF254C992E5EE3880082FF87 /* Build configuration list for PBXNativeTarget "vigil" */;
+			buildPhases = (
+				AF254C712E5EE3860082FF87 /* Sources */,
+				AF254C722E5EE3860082FF87 /* Frameworks */,
+				AF254C732E5EE3860082FF87 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				AF254C772E5EE3860082FF87 /* vigil */,
+			);
+			name = vigil;
+			packageProductDependencies = (
+				AF254CB02E5EF60E0082FF87 /* SwiftSoup */,
+			);
+			productName = vigil;
+			productReference = AF254C752E5EE3860082FF87 /* vigil.app */;
+			productType = "com.apple.product-type.application";
+		};
+		AF254C842E5EE3880082FF87 /* vigilTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AF254C9C2E5EE3880082FF87 /* Build configuration list for PBXNativeTarget "vigilTests" */;
+			buildPhases = (
+				AF254C812E5EE3880082FF87 /* Sources */,
+				AF254C822E5EE3880082FF87 /* Frameworks */,
+				AF254C832E5EE3880082FF87 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				AF254C872E5EE3880082FF87 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				AF254C882E5EE3880082FF87 /* vigilTests */,
+			);
+			name = vigilTests;
+			packageProductDependencies = (
+			);
+			productName = vigilTests;
+			productReference = AF254C852E5EE3880082FF87 /* vigilTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		AF254C8E2E5EE3880082FF87 /* vigilUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AF254C9F2E5EE3880082FF87 /* Build configuration list for PBXNativeTarget "vigilUITests" */;
+			buildPhases = (
+				AF254C8B2E5EE3880082FF87 /* Sources */,
+				AF254C8C2E5EE3880082FF87 /* Frameworks */,
+				AF254C8D2E5EE3880082FF87 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				AF254C912E5EE3880082FF87 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				AF254C922E5EE3880082FF87 /* vigilUITests */,
+			);
+			name = vigilUITests;
+			packageProductDependencies = (
+			);
+			productName = vigilUITests;
+			productReference = AF254C8F2E5EE3880082FF87 /* vigilUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		AF254C6D2E5EE3850082FF87 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1620;
+				LastUpgradeCheck = 1620;
+				TargetAttributes = {
+					AF254C742E5EE3860082FF87 = {
+						CreatedOnToolsVersion = 16.2;
+					};
+					AF254C842E5EE3880082FF87 = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = AF254C742E5EE3860082FF87;
+					};
+					AF254C8E2E5EE3880082FF87 = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = AF254C742E5EE3860082FF87;
+					};
+				};
+			};
+			buildConfigurationList = AF254C702E5EE3850082FF87 /* Build configuration list for PBXProject "vigil" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = AF254C6C2E5EE3850082FF87;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				AF254CAF2E5EF5D70082FF87 /* XCRemoteSwiftPackageReference "SwiftSoup" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = AF254C762E5EE3860082FF87 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				AF254C742E5EE3860082FF87 /* vigil */,
+				AF254C842E5EE3880082FF87 /* vigilTests */,
+				AF254C8E2E5EE3880082FF87 /* vigilUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		AF254C732E5EE3860082FF87 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AF254C832E5EE3880082FF87 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AF254C8D2E5EE3880082FF87 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		AF254C712E5EE3860082FF87 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AF254C812E5EE3880082FF87 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AF254C8B2E5EE3880082FF87 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		AF254C872E5EE3880082FF87 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AF254C742E5EE3860082FF87 /* vigil */;
+			targetProxy = AF254C862E5EE3880082FF87 /* PBXContainerItemProxy */;
+		};
+		AF254C912E5EE3880082FF87 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AF254C742E5EE3860082FF87 /* vigil */;
+			targetProxy = AF254C902E5EE3880082FF87 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		AF254C972E5EE3880082FF87 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		AF254C982E5EE3880082FF87 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		AF254C9A2E5EE3880082FF87 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"vigil/Preview Content\"";
+				DEVELOPMENT_TEAM = 3565MT84D4;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = vigil/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = NO;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.vigil;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		AF254C9B2E5EE3880082FF87 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"vigil/Preview Content\"";
+				DEVELOPMENT_TEAM = 3565MT84D4;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = vigil/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = NO;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.vigil;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		AF254C9D2E5EE3880082FF87 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 3565MT84D4;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.vigilTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/vigil.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/vigil";
+			};
+			name = Debug;
+		};
+		AF254C9E2E5EE3880082FF87 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 3565MT84D4;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.vigilTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/vigil.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/vigil";
+			};
+			name = Release;
+		};
+		AF254CA02E5EE3880082FF87 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 3565MT84D4;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.vigilUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = vigil;
+			};
+			name = Debug;
+		};
+		AF254CA12E5EE3880082FF87 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 3565MT84D4;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.vigilUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = vigil;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		AF254C702E5EE3850082FF87 /* Build configuration list for PBXProject "vigil" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AF254C972E5EE3880082FF87 /* Debug */,
+				AF254C982E5EE3880082FF87 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AF254C992E5EE3880082FF87 /* Build configuration list for PBXNativeTarget "vigil" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AF254C9A2E5EE3880082FF87 /* Debug */,
+				AF254C9B2E5EE3880082FF87 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AF254C9C2E5EE3880082FF87 /* Build configuration list for PBXNativeTarget "vigilTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AF254C9D2E5EE3880082FF87 /* Debug */,
+				AF254C9E2E5EE3880082FF87 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AF254C9F2E5EE3880082FF87 /* Build configuration list for PBXNativeTarget "vigilUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AF254CA02E5EE3880082FF87 /* Debug */,
+				AF254CA12E5EE3880082FF87 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		AF254CAF2E5EF5D70082FF87 /* XCRemoteSwiftPackageReference "SwiftSoup" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/scinfu/SwiftSoup.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.11.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		AF254CB02E5EF60E0082FF87 /* SwiftSoup */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AF254CAF2E5EF5D70082FF87 /* XCRemoteSwiftPackageReference "SwiftSoup" */;
+			productName = SwiftSoup;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = AF254C6D2E5EE3850082FF87 /* Project object */;
+}
