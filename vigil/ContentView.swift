@@ -11,34 +11,83 @@ struct ContentView: View {
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: 24) {
-                imageSection
-                cameraButton
-                galleryPicker
-                compareButton
-                resultSection
-                matchesSection
-                Spacer()
+            VStack(alignment: .leading, spacing: 4) {
+                // Custom Title + Tagline
+                Text("SecureScan")
+                    .font(.largeTitle.bold())
+                Text("Next-gen face recognition for peace of mind.")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
             }
-            .padding()
-            .navigationTitle("Face Compare")
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding([.top, .horizontal])
+
+            ScrollView {
+                VStack(spacing: 24) {
+                    imageSection
+                    actionButtons
+                    resultSection
+                    matchesSection
+                }
+                .padding()
+            }
+            .background(Color(.systemGroupedBackground).ignoresSafeArea())
         }
     }
 }
 
+// MARK: - Subviews
+
 private extension ContentView {
-    @ViewBuilder
+
+    // MARK: Image Display + Remove Button
     var imageSection: some View {
-        if let image = image {
-            Image(uiImage: image)
-                .resizable()
-                .scaledToFit()
-                .frame(maxHeight: 300)
-                .clipShape(RoundedRectangle(cornerRadius: 16))
-                .shadow(radius: 4)
-        } else {
-            Text("No image selected")
-                .foregroundStyle(.secondary)
+        VStack {
+            if let image = image {
+                Image(uiImage: image)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(maxHeight: 300)
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                    .shadow(radius: 4)
+                    .transition(.opacity)
+                    .animation(.easeInOut, value: image)
+
+                Button {
+                    clearImage()
+                } label: {
+                    Label("Remove Photo", systemImage: "xmark.circle")
+                        .font(.subheadline)
+                        .foregroundColor(.red)
+                }
+                .padding(.top, 4)
+            } else {
+                VStack(spacing: 12) {
+                    Image(systemName: "photo.on.rectangle.angled")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 80, height: 80)
+                        .foregroundColor(.gray.opacity(0.4))
+                    Text("No image selected")
+                        .foregroundStyle(.secondary)
+                }
+                .frame(maxWidth: .infinity, minHeight: 200)
+            }
+        }
+        .padding()
+        .background(RoundedRectangle(cornerRadius: 16).fill(Color.white).shadow(radius: 3))
+    }
+
+    // MARK: Action Buttons
+    var actionButtons: some View {
+        VStack(spacing: 12) {
+            Text("Choose an Image")
+                .font(.headline)
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+            cameraButton
+            galleryPicker
+            compareButton
         }
     }
 
@@ -67,9 +116,9 @@ private extension ContentView {
                 .foregroundColor(.white)
                 .clipShape(RoundedRectangle(cornerRadius: 12))
         }
-        .onChange(of: selectedItem) { newValue in
+        .onChange(of: selectedItem) {
             Task {
-                if let data = try? await newValue?.loadTransferable(type: Data.self),
+                if let data = try? await selectedItem?.loadTransferable(type: Data.self),
                    let uiImage = UIImage(data: data) {
                     await MainActor.run { image = uiImage }
                 }
@@ -77,67 +126,89 @@ private extension ContentView {
         }
     }
 
+    @ViewBuilder
     var compareButton: some View {
-        Group {
-            if let image = image {
-                Button {
-                    Task { await runFaceComparison(for: image) }
-                } label: {
-                    if isUploading {
-                        ProgressView().frame(maxWidth: .infinity)
-                    } else {
-                        Label("Compare Faces", systemImage: "arrow.up.circle")
-                            .font(.headline)
-                            .padding()
-                            .frame(maxWidth: .infinity)
-                            .background(Color.green)
-                            .foregroundColor(.white)
-                            .clipShape(RoundedRectangle(cornerRadius: 12))
-                    }
+        if let image {
+            Button {
+                Task { await runFaceComparison(for: image) }
+            } label: {
+                if isUploading {
+                    ProgressView()
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                } else {
+                    Label("Compare Faces", systemImage: "arrow.up.circle")
+                        .font(.headline)
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(Color.green)
+                        .foregroundColor(.white)
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
                 }
             }
+        } else {
+            EmptyView()
         }
     }
 
+    // MARK: Upload Result
     @ViewBuilder
     var resultSection: some View {
         if let result = uploadResult {
             Text(result)
-                .foregroundStyle(.secondary)
                 .padding()
+                .frame(maxWidth: .infinity)
+                .background(RoundedRectangle(cornerRadius: 12).fill(Color.green.opacity(0.1)))
+                .foregroundColor(.green)
                 .multilineTextAlignment(.center)
+        } else {
+            EmptyView()
         }
     }
 
+    // MARK: Matches List
     @ViewBuilder
     var matchesSection: some View {
         if !matches.isEmpty {
-            ScrollView {
-                VStack(spacing: 8) {
-                    ForEach(matches) { match in
-                        HStack(spacing: 12) {
-                            Image(uiImage: match.image)
-                                .resizable()
-                                .frame(width: 60, height: 60)
-                                .clipShape(RoundedRectangle(cornerRadius: 8))
-                                .shadow(radius: 2)
-                            VStack(alignment: .leading) {
-                                Text(match.key).font(.headline)
-                                Text("Similarity: \(String(format: "%.2f", match.similarity))")
-                                    .font(.subheadline).foregroundColor(.secondary)
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Matches")
+                    .font(.headline)
+                    .padding(.bottom, 4)
+
+                ScrollView {
+                    LazyVStack(spacing: 12) {
+                        ForEach(matches) { match in
+                            HStack(spacing: 12) {
+                                Image(uiImage: match.image)
+                                    .resizable()
+                                    .frame(width: 60, height: 60)
+                                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                                    .shadow(radius: 2)
+
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(match.key)
+                                        .font(.headline)
+                                    Text("Similarity: \(String(format: "%.2f", match.similarity))")
+                                        .font(.subheadline)
+                                        .foregroundColor(.secondary)
+                                }
+                                Spacer()
                             }
-                            Spacer()
+                            .padding()
+                            .background(RoundedRectangle(cornerRadius: 12).fill(Color(.systemBackground)))
+                            .shadow(color: Color.black.opacity(0.05), radius: 3, x: 0, y: 2)
                         }
-                        .padding(4)
-                        .background(RoundedRectangle(cornerRadius: 8).fill(Color.gray.opacity(0.1)))
                     }
+                    .padding(.horizontal)
                 }
-                .padding(.horizontal)
+                .frame(maxHeight: 300)
             }
-            .frame(maxHeight: 300)
+        } else {
+            EmptyView()
         }
     }
 
+    // MARK: Face Comparison Logic
     func runFaceComparison(for image: UIImage) async {
         await MainActor.run { isUploading = true }
         FaceCompare.shared.compareFaces(image: image)
@@ -146,6 +217,14 @@ private extension ContentView {
             uploadResult = FaceCompare.shared.resultMessage
             isUploading = false
         }
+    }
+
+    // MARK: Clear Image and Reset State
+    func clearImage() {
+        image = nil
+        selectedItem = nil
+        uploadResult = nil
+        matches = []
     }
 }
 
