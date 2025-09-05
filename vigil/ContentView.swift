@@ -3,6 +3,7 @@ import PhotosUI
 
 struct ContentView: View {
     @State private var showCamera = false
+    @State private var flashOn = false            // Flash toggle state
     @State private var selectedItem: PhotosPickerItem? = nil
     @State private var image: UIImage? = nil
     @State private var isUploading = false
@@ -12,7 +13,7 @@ struct ContentView: View {
     var body: some View {
         NavigationStack {
             VStack(alignment: .leading, spacing: 4) {
-                // Custom Title + Tagline
+                // Title + Tagline
                 Text("SecureScan")
                     .font(.largeTitle.bold())
                 Text("Next-gen face recognition for peace of mind.")
@@ -32,6 +33,25 @@ struct ContentView: View {
                 .padding()
             }
             .background(Color(.systemGroupedBackground).ignoresSafeArea())
+
+            // Flash toggle outside camera sheet to avoid overlapping
+            HStack {
+                Spacer()
+                Button {
+                    flashOn.toggle()
+                } label: {
+                    Image(systemName: flashOn ? "bolt.fill" : "bolt.slash.fill")
+                        .font(.title2)
+                        .padding(10)
+                        .background(Color.black.opacity(0.7))
+                        .clipShape(Circle())
+                        .foregroundColor(flashOn ? .yellow : .white)
+                }
+                .padding()
+            }
+        }
+        .sheet(isPresented: $showCamera) {
+            CameraView(image: $image, flashOn: $flashOn)
         }
     }
 }
@@ -100,9 +120,6 @@ private extension ContentView {
                 .background(Color.blue)
                 .foregroundColor(.white)
                 .clipShape(RoundedRectangle(cornerRadius: 12))
-        }
-        .sheet(isPresented: $showCamera) {
-            CameraView(image: $image)
         }
     }
 

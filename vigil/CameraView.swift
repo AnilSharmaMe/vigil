@@ -4,16 +4,28 @@ import UIKit
 struct CameraView: UIViewControllerRepresentable {
     @Binding var image: UIImage?
     @Environment(\.presentationMode) private var presentationMode
+    @Binding var flashOn: Bool  // Add flash state binding
 
     func makeUIViewController(context: Context) -> UIImagePickerController {
         let picker = UIImagePickerController()
         picker.delegate = context.coordinator
         picker.sourceType = .camera
-//        picker.cameraDevice = .front
+        picker.cameraDevice = .rear
+        
+        // Set flash mode based on flashOn state (default to off if not supported)
+        if UIImagePickerController.isFlashAvailable(for: .rear) {
+            picker.cameraFlashMode = flashOn ? .on : .off
+        }
+        
         return picker
     }
 
-    func updateUIViewController(_ uiViewController: UIImagePickerController, context: Context) {}
+    func updateUIViewController(_ uiViewController: UIImagePickerController, context: Context) {
+        // Update flash mode when state changes
+        if UIImagePickerController.isFlashAvailable(for: .rear) {
+            uiViewController.cameraFlashMode = flashOn ? .on : .off
+        }
+    }
 
     func makeCoordinator() -> Coordinator {
         Coordinator(self)
