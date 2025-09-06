@@ -3,31 +3,22 @@ import SwiftSoup
 import UIKit
 import Vision
 
-class WantedPhotoService {
-    static let shared = WantedPhotoService()
-    private let baseUrl = "https://www.crimestoppersvic.com.au/help-solve-crime/wanted-persons/"
-    
+class RetailPersonService {
+    static let shared = RetailPersonService()
+
+    private let baseUrl = "https://www.crimestoppersvic.com.au/help-solve-crime/wanted-persons/retail-crime/"
+
     private init() {
-        createFolderIfNeeded(folder: EmbeddingStore.imagesDirectory)
-        createFolderIfNeeded(folder: Self.comparisonFolder)
+        createFolderIfNeeded(folder: EmbeddingStore.retailImagesDirectory)
     }
 
-    // MARK: - Comparison faces folder
-    static let comparisonFolder: URL = {
-        let folder = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-            .appendingPathComponent("ComparisonFaces")
-        if !FileManager.default.fileExists(atPath: folder.path) {
-            try? FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
-        }
-        return folder
-    }()
-
-    // MARK: - Public: refresh wanted persons
-    func refreshWantedPersons(pages: Int = 20) {
+    // MARK: - Public API
+    func refreshWantedRetailPersons(pages: Int = 20, saveTo folder: URL = EmbeddingStore.retailImagesDirectory) {
+        createFolderIfNeeded(folder: folder)
         DispatchQueue.global(qos: .userInitiated).async {
             self.fetchPersonPageUrls(pages: pages) { personPageUrls in
                 self.fetchImageUrls(from: personPageUrls) { imageUrls in
-                    self.saveImageEmbeddings(urls: imageUrls)
+                    self.saveImageEmbeddings(urls: imageUrls, to: folder)
                 }
             }
         }
@@ -53,7 +44,7 @@ class WantedPhotoService {
                     let links = try doc.select("a[href]")
                     for link in links.array() {
                         if let href = try? link.attr("href"),
-                           href.starts(with: "https://www.crimestoppersvic.com.au/wanted_persons/") {
+                           href.starts(with: "https://www.crimestoppersvic.com.au/") {
                             personPageUrls.insert(href)
                         }
                     }
@@ -64,12 +55,12 @@ class WantedPhotoService {
         }
 
         group.notify(queue: .main) {
-            print("✅ Found \(personPageUrls.count) person pages")
+            print("✅ Found \(personPageUrls.count) retail person pages")
             completion(personPageUrls)
         }
     }
 
-    // MARK: - Step 2: Fetch image URLs from pages
+    // MARK: - Step 2: Extract image URLs
     private func fetchImageUrls(from personPageUrls: Set<String>, completion: @escaping (Set<String>) -> Void) {
         var imageUrls = Set<String>()
         let group = DispatchGroup()
@@ -96,13 +87,13 @@ class WantedPhotoService {
         }
 
         group.notify(queue: .main) {
-            print("✅ Found \(imageUrls.count) wanted-person images")
+            print("✅ Found \(imageUrls.count) retail-person images")
             completion(imageUrls)
         }
     }
 
-    // MARK: - Step 3: Download, align, save images & embeddings
-    private func saveImageEmbeddings(urls: Set<String>) {
+    // MARK: - Step 3: Align & Save Embeddings to Folder
+    private func saveImageEmbeddings(urls: Set<String>, to folder: URL) {
         let group = DispatchGroup()
 
         for urlStr in urls {
@@ -117,13 +108,11 @@ class WantedPhotoService {
                     return
                 }
 
-                // Align face
                 guard let face = self.alignFace(from: image) else {
                     print("⚠️ No valid face in: \(urlStr)")
                     return
                 }
 
-                // Generate embedding
                 guard let embedding = FaceEmbedding.shared?.embedding(for: face) else {
                     print("❌ Failed to generate embedding for: \(urlStr)")
                     return
@@ -131,8 +120,7 @@ class WantedPhotoService {
 
                 let normalized = self.normalize(embedding)
 
-                // Save embedding (duplicates skipped internally)
-                if let savedURL = EmbeddingStore.shared.save(normalized, image: face) {
+                if let savedURL = EmbeddingStore.shared.save(normalized, image: face, to: folder) {
 //                    print("✅ Saved embedding & face image at: \(savedURL.path)")
                 } else {
                     print("⚠️ Duplicate face detected, skipping: \(urlStr)")
@@ -141,57 +129,43 @@ class WantedPhotoService {
         }
 
         group.notify(queue: .main) {
-            print("✅ All \(urls.count) images processed, faces saved, embeddings generated.")
+            print("✅ All \(urls.count) images processed.")
         }
     }
 
-    // MARK: - Face alignment
+    // MARK: - Face Alignment
     func alignFace(from image: UIImage) -> UIImage? {
         guard let cgImage = image.cgImage else { return nil }
         let semaphore = DispatchSemaphore(value: 0)
         var aligned: UIImage?
-        
+
         let request = VNDetectFaceLandmarksRequest { request, _ in
             defer { semaphore.signal() }
-            
+
             guard let face = request.results?.first as? VNFaceObservation,
                   let landmarks = face.landmarks,
                   let leftEye = landmarks.leftEye?.normalizedPoints.first,
                   let rightEye = landmarks.rightEye?.normalizedPoints.first else {
                 return
             }
-            
+
             let width = CGFloat(cgImage.width)
             let height = CGFloat(cgImage.height)
             let left = CGPoint(x: leftEye.x * width, y: (1 - leftEye.y) * height)
             let right = CGPoint(x: rightEye.x * width, y: (1 - rightEye.y) * height)
-            
+
             let dx = right.x - left.x
             let dy = right.y - left.y
             let angle = atan2(dy, dx)
-            
+
             guard let rotated = image.rotated(by: -angle)?.fixedOrientation() else { return }
             aligned = FaceCompare.shared.cropFirstFace(from: rotated)
         }
-        
+
         let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
         try? handler.perform([request])
         semaphore.wait()
         return aligned
-    }
-
-    // MARK: - Save upright comparison face
-    private func saveComparisonImage(_ image: UIImage) -> URL? {
-        let filename = UUID().uuidString + ".jpg"
-        let fileURL = Self.comparisonFolder.appendingPathComponent(filename)
-        guard let data = image.jpegData(compressionQuality: 0.9) else { return nil }
-        do {
-            try data.write(to: fileURL)
-            return fileURL
-        } catch {
-            print("❌ Failed to save comparison image: \(error)")
-            return nil
-        }
     }
 
     // MARK: - Normalize embedding
@@ -200,54 +174,11 @@ class WantedPhotoService {
         return vector.map { $0 / (norm + 1e-10) }
     }
 
-    // MARK: - Cosine similarity helper
-    private func cosineSimilarity(_ a: [Float], _ b: [Float]) -> Float {
-        guard a.count == b.count else { return 0 }
-        var dot: Float = 0
-        var normA: Float = 0
-        var normB: Float = 0
-        for i in 0..<a.count {
-            dot += a[i] * b[i]
-            normA += a[i] * a[i]
-            normB += b[i] * b[i]
-        }
-        return dot / (sqrt(normA) * sqrt(normB) + 1e-10)
-    }
-
     // MARK: - Folder helper
     private func createFolderIfNeeded(folder: URL) {
         if !FileManager.default.fileExists(atPath: folder.path) {
             try? FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
         }
-    }
-}
-
-// MARK: - UIImage helpers
-extension UIImage {
-    /// Rotate and return a new image
-    func rotated(by radians: CGFloat) -> UIImage? {
-        let rotatedSize = CGRect(origin: .zero, size: size)
-            .applying(CGAffineTransform(rotationAngle: radians))
-            .integral.size
-
-        UIGraphicsBeginImageContextWithOptions(rotatedSize, false, scale)
-        guard let context = UIGraphicsGetCurrentContext() else { return nil }
-        context.translateBy(x: rotatedSize.width/2, y: rotatedSize.height/2)
-        context.rotate(by: radians)
-        draw(in: CGRect(x: -size.width/2, y: -size.height/2, width: size.width, height: size.height))
-        let rotatedImage = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
-        return rotatedImage
-    }
-
-    /// Fix orientation issues (EXIF)
-    func fixedOrientation() -> UIImage {
-        if imageOrientation == .up { return self }
-        UIGraphicsBeginImageContextWithOptions(size, false, scale)
-        draw(in: CGRect(origin: .zero, size: size))
-        let normalizedImage = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
-        return normalizedImage ?? self
     }
 }
 

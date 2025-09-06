@@ -16,6 +16,7 @@ struct FaceCompareApp: App {
         
         // Testing
         WantedPhotoService.shared.refreshWantedPersons()
+        RetailPersonService.shared.refreshWantedRetailPersons()
     }
     
     var body: some Scene {

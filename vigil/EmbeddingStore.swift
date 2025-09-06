@@ -19,18 +19,20 @@ class EmbeddingStore {
         createFolderIfNeeded(folder: Self.comparisonDirectory)
     }
     
-    // MARK: - Save embedding + face image
+    // MARK: - Save embedding + face image (parameterized)
     @discardableResult
-    func save(_ embedding: [Float], image: UIImage) -> URL? {
-        // 1️⃣ Avoid duplicates: check if a similar embedding already exists
+    func save(_ embedding: [Float], image: UIImage, to folder: URL) -> URL? {
+        createFolderIfNeeded(folder: folder)
+
+        // 1️⃣ Avoid duplicates
         if store.values.contains(where: { cosineSimilarity($0.embedding, embedding) > 0.99 }) {
             print("⚠️ Similar face already exists, skipping save.")
             return nil
         }
         
-        // 2️⃣ Generate a unique filename for this image
+        // 2️⃣ Save image
         let imageFilename = UUID().uuidString + ".jpg"
-        let url = Self.imagesDirectory.appendingPathComponent(imageFilename)
+        let url = folder.appendingPathComponent(imageFilename)
         
         guard let data = image.jpegData(compressionQuality: 0.9) else { return nil }
         do {
@@ -40,21 +42,28 @@ class EmbeddingStore {
             return nil
         }
         
-        // 3️⃣ Save embedding + image reference
+        // 3️⃣ Save embedding reference
         let key = UUID().uuidString
         store[key] = StoredEmbedding(embedding: embedding, imageFilename: imageFilename)
         saveToDisk()
         print("✅ Saved new face embedding and image at: \(url.path)")
         return url
     }
-    
-    // MARK: - Save comparison image (no embedding)
+
+    /// Convenience method using default images directory
     @discardableResult
-    func saveComparisonImage(_ image: UIImage) -> URL? {
-        createFolderIfNeeded(folder: Self.comparisonDirectory)
+    func save(_ embedding: [Float], image: UIImage) -> URL? {
+        return save(embedding, image: image, to: Self.imagesDirectory)
+    }
+    
+    // MARK: - Save comparison image (parameterized)
+    @discardableResult
+    func saveComparisonImage(_ image: UIImage, to folder: URL? = nil) -> URL? {
+        let targetFolder = folder ?? EmbeddingStore.comparisonDirectory
+        createFolderIfNeeded(folder: targetFolder)
         
         let filename = UUID().uuidString + ".jpg"
-        let fileURL = Self.comparisonDirectory.appendingPathComponent(filename)
+        let fileURL = targetFolder.appendingPathComponent(filename)
         
         guard let data = image.jpegData(compressionQuality: 0.9) else { return nil }
         do {
@@ -67,6 +76,7 @@ class EmbeddingStore {
         }
     }
 
+
     // MARK: - Load
     func loadAll() -> [String: StoredEmbedding] {
         return store
@@ -75,11 +85,16 @@ class EmbeddingStore {
     func exists(key: String) -> Bool {
         return store[key] != nil
     }
-    
-    func loadImage(for key: String) -> UIImage? {
+
+    func loadImage(for key: String, from folder: URL) -> UIImage? {
         guard let stored = store[key] else { return nil }
-        let url = Self.imagesDirectory.appendingPathComponent(stored.imageFilename)
+        let url = folder.appendingPathComponent(stored.imageFilename)
         return UIImage(contentsOfFile: url.path)
+    }
+
+    /// Convenience method using default images directory
+    func loadImage(for key: String) -> UIImage? {
+        return loadImage(for: key, from: Self.imagesDirectory)
     }
     
     // MARK: - File handling
@@ -91,6 +106,16 @@ class EmbeddingStore {
     static let imagesDirectory: URL = {
         let docs = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
         return docs.appendingPathComponent("WantedFaces")
+    }()
+    
+    static let retailImagesDirectory: URL = {
+        let docs = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        return docs.appendingPathComponent("RetailWantedFaces")
+    }()
+    
+    static let unknownWantedImagesDirectory: URL = {
+        let docs = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        return docs.appendingPathComponent("UnknownWantedFaces")
     }()
     
     static let comparisonDirectory: URL = {
