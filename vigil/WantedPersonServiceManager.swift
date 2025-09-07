@@ -3,29 +3,71 @@ import SwiftSoup
 import UIKit
 import Vision
 
-class UnsolvedWantedPersonService {
-    static let shared = UnsolvedWantedPersonService()
+enum WantedPersonCategory {
+    case unsolved
+    case regular
+    case retail
 
-    private let baseUrl = "https://www.crimestoppersvic.com.au/help-solve-crime/unsolved-cases/"
-
-    private init() {
-        createFolderIfNeeded(folder: EmbeddingStore.unknownWantedImagesDirectory)
+    var embeddingCategory: EmbeddingCategory {
+        switch self {
+        case .unsolved: return .unsolved
+        case .regular: return .regular
+        case .retail: return .retail
+        }
     }
+}
+
+class WantedPersonServiceManager {
+    static let shared = WantedPersonServiceManager()
+    private init() {}
 
     // MARK: - Public API
-    func refreshWantedUnknownPersons(pages: Int = 20, saveTo folder: URL = EmbeddingStore.unknownWantedImagesDirectory) {
-        createFolderIfNeeded(folder: folder)
+    /// Refresh wanted persons for a specific category
+    func refresh(category: WantedPersonCategory,
+                 pages: Int = 20,
+                 includeComparisonFolder: Bool = false) {
+        
+        let targetFolder = category.embeddingCategory.folder
+        createFolderIfNeeded(folder: targetFolder)
+        
+        var comparisonFolder: URL?
+        if includeComparisonFolder {
+            comparisonFolder = EmbeddingStore.comparisonDirectory
+            createFolderIfNeeded(folder: comparisonFolder!)
+        }
+        
         DispatchQueue.global(qos: .userInitiated).async {
-            self.fetchPersonPageUrls(pages: pages) { personPageUrls in
+            self.fetchPersonPageUrls(category: category, pages: pages) { personPageUrls in
                 self.fetchImageUrls(from: personPageUrls) { imageUrls in
-                    self.saveImageEmbeddings(urls: imageUrls, to: folder)
+                    self.saveImageEmbeddings(urls: imageUrls,
+                                             category: category.embeddingCategory,
+                                             comparisonFolder: comparisonFolder)
                 }
             }
         }
     }
 
-    // MARK: - Step 1: Fetch all person page URLs
-    private func fetchPersonPageUrls(pages: Int, completion: @escaping (Set<String>) -> Void) {
+    // MARK: - Folder helper
+    private func createFolderIfNeeded(folder: URL) {
+        if !FileManager.default.fileExists(atPath: folder.path) {
+            try? FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        }
+    }
+
+    // MARK: - Step 1: Fetch person page URLs
+    private func fetchPersonPageUrls(category: WantedPersonCategory,
+                                     pages: Int,
+                                     completion: @escaping (Set<String>) -> Void) {
+        let baseUrl: String
+        switch category {
+        case .unsolved:
+            baseUrl = "https://www.crimestoppersvic.com.au/help-solve-crime/unsolved-cases/"
+        case .regular:
+            baseUrl = "https://www.crimestoppersvic.com.au/help-solve-crime/wanted-persons/"
+        case .retail:
+            baseUrl = "https://www.crimestoppersvic.com.au/help-solve-crime/wanted-persons/retail-crime/"
+        }
+
         var personPageUrls = Set<String>()
         let group = DispatchGroup()
 
@@ -55,13 +97,14 @@ class UnsolvedWantedPersonService {
         }
 
         group.notify(queue: .main) {
-            print("✅ Found \(personPageUrls.count) unknown person pages")
+            print("✅ Found \(personPageUrls.count) \(category) pages")
             completion(personPageUrls)
         }
     }
 
-    // MARK: - Step 2: Extract image URLs
-    private func fetchImageUrls(from personPageUrls: Set<String>, completion: @escaping (Set<String>) -> Void) {
+    // MARK: - Step 2: Fetch image URLs
+    private func fetchImageUrls(from personPageUrls: Set<String>,
+                                completion: @escaping (Set<String>) -> Void) {
         var imageUrls = Set<String>()
         let group = DispatchGroup()
 
@@ -87,13 +130,15 @@ class UnsolvedWantedPersonService {
         }
 
         group.notify(queue: .main) {
-            print("✅ Found \(imageUrls.count) unknown-person images")
+            print("✅ Found \(imageUrls.count) images")
             completion(imageUrls)
         }
     }
 
-    // MARK: - Step 3: Align & Save Embeddings to Folder
-    private func saveImageEmbeddings(urls: Set<String>, to folder: URL) {
+    // MARK: - Step 3: Download, align, generate embeddings
+    private func saveImageEmbeddings(urls: Set<String>,
+                                     category: EmbeddingCategory,
+                                     comparisonFolder: URL?) {
         let group = DispatchGroup()
 
         for urlStr in urls {
@@ -103,7 +148,7 @@ class UnsolvedWantedPersonService {
             URLSession.shared.dataTask(with: url) { data, _, error in
                 defer { group.leave() }
                 guard let data = data, error == nil,
-                      let image = UIImage(data: data)?.fixedOrientation() else {
+                      let image = UIImage(data: data)?.withFixedOrientation() else {
                     print("❌ Failed to download image: \(urlStr)")
                     return
                 }
@@ -120,8 +165,10 @@ class UnsolvedWantedPersonService {
 
                 let normalized = self.normalize(embedding)
 
-                if let savedURL = EmbeddingStore.shared.save(normalized, image: face, to: folder) {
-                    print("✅ Saved embedding & face image at: \(savedURL.path)")
+                if let savedURL = EmbeddingStore.shared.save(normalized, image: face, category: category) {
+                    if let compFolder = comparisonFolder {
+                        _ = EmbeddingStore.shared.saveComparisonImage(face, to: compFolder)
+                    }
                 } else {
                     print("⚠️ Duplicate face detected, skipping: \(urlStr)")
                 }
@@ -129,11 +176,11 @@ class UnsolvedWantedPersonService {
         }
 
         group.notify(queue: .main) {
-            print("✅ All \(urls.count) images processed.")
+            print("✅ All \(urls.count) images processed for category \(category)")
         }
     }
 
-    // MARK: - Face Alignment
+    // MARK: - Face alignment
     func alignFace(from image: UIImage) -> UIImage? {
         guard let cgImage = image.cgImage else { return nil }
         let semaphore = DispatchSemaphore(value: 0)
@@ -145,12 +192,11 @@ class UnsolvedWantedPersonService {
             guard let face = request.results?.first as? VNFaceObservation,
                   let landmarks = face.landmarks,
                   let leftEye = landmarks.leftEye?.normalizedPoints.first,
-                  let rightEye = landmarks.rightEye?.normalizedPoints.first else {
-                return
-            }
+                  let rightEye = landmarks.rightEye?.normalizedPoints.first else { return }
 
             let width = CGFloat(cgImage.width)
             let height = CGFloat(cgImage.height)
+
             let left = CGPoint(x: leftEye.x * width, y: (1 - leftEye.y) * height)
             let right = CGPoint(x: rightEye.x * width, y: (1 - rightEye.y) * height)
 
@@ -158,8 +204,9 @@ class UnsolvedWantedPersonService {
             let dy = right.y - left.y
             let angle = atan2(dy, dx)
 
-            guard let rotated = image.rotated(by: -angle)?.fixedOrientation() else { return }
-            aligned = FaceCompare.shared.cropFirstFace(from: rotated)
+            guard let rotated = image.rotatedImage(by: -angle)?.withFixedOrientation() else { return }
+
+            aligned = FaceCompare.shared.cropFirstFace(from: rotated)?.withFixedOrientation()
         }
 
         let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
@@ -173,12 +220,32 @@ class UnsolvedWantedPersonService {
         let norm = sqrt(vector.map { $0 * $0 }.reduce(0, +))
         return vector.map { $0 / (norm + 1e-10) }
     }
+}
 
-    // MARK: - Folder helper
-    private func createFolderIfNeeded(folder: URL) {
-        if !FileManager.default.fileExists(atPath: folder.path) {
-            try? FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
-        }
+// MARK: - UIImage helpers
+extension UIImage {
+    func withFixedOrientation() -> UIImage {
+        if imageOrientation == .up { return self }
+        UIGraphicsBeginImageContextWithOptions(size, false, scale)
+        draw(in: CGRect(origin: .zero, size: size))
+        let normalizedImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        return normalizedImage ?? self
+    }
+
+    func rotatedImage(by radians: CGFloat) -> UIImage? {
+        let rotatedSize = CGRect(origin: .zero, size: size)
+            .applying(CGAffineTransform(rotationAngle: radians))
+            .integral.size
+
+        UIGraphicsBeginImageContextWithOptions(rotatedSize, false, scale)
+        guard let context = UIGraphicsGetCurrentContext() else { return nil }
+        context.translateBy(x: rotatedSize.width/2, y: rotatedSize.height/2)
+        context.rotate(by: radians)
+        draw(in: CGRect(x: -size.width/2, y: -size.height/2, width: size.width, height: size.height))
+        let rotatedImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        return rotatedImage
     }
 }
 

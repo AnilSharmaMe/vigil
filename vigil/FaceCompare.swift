@@ -16,9 +16,8 @@ class FaceCompare {
     var isProcessing = false
     var resultMessage: String?
 
-    // MARK: - Compare faces using cosine similarity
+    // MARK: - Compare faces using cosine similarity across all categories
     func compareFaces(image: UIImage, threshold: Float = 0.8) {
-        // Fix orientation first
         let fixedImage = image.withFixedOrientation()
 
         guard let alignedFace = alignFace(from: fixedImage),
@@ -29,20 +28,23 @@ class FaceCompare {
         }
 
         // Save upright comparison face
-        if let savedURL = EmbeddingStore.shared.saveComparisonImage(alignedFace) {
-            print("✅ Comparison image saved at: \(savedURL.path)")
-        }
+        _ = EmbeddingStore.shared.saveComparisonImage(alignedFace)
 
         self.isProcessing = true
         self.matches = []
 
-        let store = EmbeddingStore.shared.loadAll()
         var foundMatches: [FaceMatch] = []
 
-        for (key, stored) in store {
-            let similarity = cosineSimilarity(capturedEmbedding, stored.embedding)
-            if similarity >= threshold, let storedImage = EmbeddingStore.shared.loadImage(for: key) {
-                foundMatches.append(FaceMatch(key: key, similarity: similarity, image: storedImage))
+        // Compare against all categories
+        let allCategories: [EmbeddingCategory] = [.regular, .retail, .unsolved]
+        for category in allCategories {
+            let store = EmbeddingStore.shared.loadAll(category: category)
+            for (key, stored) in store {
+                let similarity = cosineSimilarity(capturedEmbedding, stored.embedding)
+                if similarity >= threshold,
+                   let storedImage = loadImage(for: key, category: category) {
+                    foundMatches.append(FaceMatch(key: key, similarity: similarity, image: storedImage))
+                }
             }
         }
 
@@ -56,6 +58,12 @@ class FaceCompare {
         print("✅ Comparison complete. Highest similarity: \(self.matches.first?.similarity ?? 0), total matches: \(foundMatches.count), threshold: \(threshold)")
     }
 
+    // MARK: - Load stored image for a specific category
+    private func loadImage(for key: String, category: EmbeddingCategory) -> UIImage? {
+        guard let stored = EmbeddingStore.shared.loadAll(category: category)[key] else { return nil }
+        let url = category.folder.appendingPathComponent(stored.imageFilename)
+        return UIImage(contentsOfFile: url.path)?.withFixedOrientation()
+    }
 
     // MARK: - Align face using eyes
     func alignFace(from image: UIImage) -> UIImage? {
@@ -65,12 +73,11 @@ class FaceCompare {
 
         let request = VNDetectFaceLandmarksRequest { request, _ in
             defer { semaphore.signal() }
+
             guard let face = request.results?.first as? VNFaceObservation,
                   let landmarks = face.landmarks,
                   let leftEye = landmarks.leftEye?.normalizedPoints.first,
-                  let rightEye = landmarks.rightEye?.normalizedPoints.first else {
-                return
-            }
+                  let rightEye = landmarks.rightEye?.normalizedPoints.first else { return }
 
             let width = CGFloat(cgImage.width)
             let height = CGFloat(cgImage.height)
@@ -82,10 +89,8 @@ class FaceCompare {
             let dy = right.y - left.y
             let angle = atan2(dy, dx)
 
-            // Rotate the image first
-            guard let rotated = image.rotatedImage(by: -angle)?.withFixedOrientation() else { return }
+            guard let rotated = image.rotated(by: -angle)?.withFixedOrientation() else { return }
 
-            // Crop the face from rotated image
             aligned = self.cropFirstFace(from: rotated)?.withFixedOrientation()
         }
 
@@ -159,16 +164,7 @@ class FaceCompare {
 
 // MARK: - UIImage helpers
 extension UIImage {
-    func withFixedOrientation() -> UIImage {
-        if imageOrientation == .up { return self }
-        UIGraphicsBeginImageContextWithOptions(size, false, scale)
-        draw(in: CGRect(origin: .zero, size: size))
-        let normalizedImage = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
-        return normalizedImage ?? self
-    }
-
-    func rotatedImage(by radians: CGFloat) -> UIImage? {
+    func rotated(by radians: CGFloat) -> UIImage? {
         let rotatedSize = CGRect(origin: .zero, size: size)
             .applying(CGAffineTransform(rotationAngle: radians))
             .integral.size

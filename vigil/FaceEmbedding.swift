@@ -1,20 +1,20 @@
-import CoreML
 import UIKit
+import CoreML
 
 class FaceEmbedding {
     static let shared = FaceEmbedding()
     
-    // Replace `ArcFace` with your actual CoreML class name
+    // Replace `ArcFace` with your actual CoreML model class
     private let model: ArcFace
     
     private init?() {
-            do {
-                let config = MLModelConfiguration()
-                self.model = try ArcFace(configuration: config)
-            } catch {
-                print("❌ Failed to load ArcFace model: \(error)")
-                return nil  // ✅ allowed because initializer is failable
-            }
+        do {
+            let config = MLModelConfiguration()
+            self.model = try ArcFace(configuration: config)
+        } catch {
+            print("❌ Failed to load ArcFace model: \(error)")
+            return nil
+        }
     }
     
     // MARK: - Convert UIImage → MLMultiArray (1x3x112x112)
@@ -41,6 +41,7 @@ class FaceEmbedding {
             space: CGColorSpaceCreateDeviceRGB(),
             bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
         ) else { return nil }
+        
         context.draw(finalImage, in: CGRect(x: 0, y: 0, width: width, height: height))
         guard let pixelData = context.data else { return nil }
         let ptr = pixelData.bindMemory(to: UInt8.self, capacity: width * height * 4)
@@ -61,6 +62,7 @@ class FaceEmbedding {
                 array[[0, 2, NSNumber(value: y), NSNumber(value: x)]] = NSNumber(value: b)
             }
         }
+        
         return array
     }
     
@@ -92,4 +94,15 @@ class FaceEmbedding {
     }
 }
 
+// MARK: - UIImage extension for orientation fix
+extension UIImage {
+    func fixedOrientation() -> UIImage {
+        if imageOrientation == .up { return self }
+        UIGraphicsBeginImageContextWithOptions(size, false, scale)
+        draw(in: CGRect(origin: .zero, size: size))
+        let normalizedImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        return normalizedImage ?? self
+    }
+}
 

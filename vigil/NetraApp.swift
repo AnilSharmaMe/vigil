@@ -2,7 +2,7 @@ import SwiftUI
 import BackgroundTasks
 
 @main
-struct FaceCompareApp: App {
+struct NetraApp: App {
     
     init() {
         // Request notification permission at launch
@@ -13,15 +13,19 @@ struct FaceCompareApp: App {
         
         // Schedule the first refresh
         scheduleAppRefresh()
-        
-        // Testing
-        WantedPhotoService.shared.refreshWantedPersons()
-        RetailPersonService.shared.refreshWantedRetailPersons()
     }
     
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .onAppear {
+                    // Run initial refresh on launch without blocking UI
+                    DispatchQueue.global(qos: .userInitiated).async {
+                        WantedPersonServiceManager.shared.refresh(category: .regular)
+                        WantedPersonServiceManager.shared.refresh(category: .retail)
+                        WantedPersonServiceManager.shared.refresh(category: .unsolved)
+                    }
+                }
         }
     }
     
@@ -33,7 +37,9 @@ struct FaceCompareApp: App {
             forTaskWithIdentifier: "com.safetyapp.refreshWantedList",
             using: nil
         ) { task in
-            self.handleAppRefresh(task: task as! BGAppRefreshTask)
+            if let refreshTask = task as? BGAppRefreshTask {
+                self.handleAppRefresh(task: refreshTask)
+            }
         }
     }
     
@@ -46,8 +52,10 @@ struct FaceCompareApp: App {
         queue.maxConcurrentOperationCount = 1
         
         let operation = BlockOperation {
-            // Fetch the wanted list
-            WantedPhotoService.shared.refreshWantedPersons()
+            // Refresh all categories in background
+            WantedPersonServiceManager.shared.refresh(category: .regular)
+            WantedPersonServiceManager.shared.refresh(category: .retail)
+            WantedPersonServiceManager.shared.refresh(category: .unsolved)
         }
         
         task.expirationHandler = {
