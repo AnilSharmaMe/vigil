@@ -27,7 +27,8 @@ struct ContentView: View {
                 ScrollView {
                     VStack(spacing: 24) {
                         imageSection
-                        actionButtons
+                        if image == nil { actionButtons }
+                        compareButton
                         resultSection
                         matchesSection
                     }
@@ -43,7 +44,7 @@ struct ContentView: View {
             VStack {
                 HStack {
                     Spacer()
-                    Image("logo") // Make sure logo is in Assets.xcassets
+                    Image("logo")
                         .resizable()
                         .scaledToFit()
                         .frame(width: 60, height: 60)
@@ -58,7 +59,7 @@ struct ContentView: View {
     // MARK: - Subviews
 
     private var imageSection: some View {
-        VStack {
+        ZStack(alignment: .topTrailing) {
             if let image = image {
                 Image(uiImage: image)
                     .resizable()
@@ -69,14 +70,20 @@ struct ContentView: View {
                     .transition(.opacity)
                     .animation(.easeInOut, value: image)
 
+                // Animated remove button overlay
                 Button {
-                    clearImage()
+                    withAnimation(.easeInOut) { clearImage() }
                 } label: {
-                    Label("Remove Photo", systemImage: "xmark.circle")
-                        .font(.subheadline)
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.title)
                         .foregroundColor(.red)
+                        .padding(8)
+                        .background(.ultraThinMaterial, in: Circle())
+                        .shadow(radius: 3)
                 }
-                .padding(.top, 4)
+                .offset(x: 10, y: -10)
+                .transition(.opacity.combined(with: .scale))
+                .animation(.easeInOut, value: image)
             } else {
                 VStack(spacing: 12) {
                     Image(systemName: "photo.on.rectangle.angled")
@@ -102,7 +109,6 @@ struct ContentView: View {
 
             cameraButton
             galleryPicker
-            compareButton
         }
     }
 
@@ -133,7 +139,7 @@ struct ContentView: View {
                 do {
                     if let data = try await newItem?.loadTransferable(type: Data.self),
                        let uiImage = UIImage(data: data) {
-                        await MainActor.run { image = uiImage }
+                        await MainActor.run { withAnimation(.easeInOut) { image = uiImage } }
                     }
                 } catch {
                     print("Error loading image: \(error)")
@@ -162,8 +168,8 @@ struct ContentView: View {
                         .clipShape(RoundedRectangle(cornerRadius: 12))
                 }
             }
-        } else {
-            EmptyView()
+            .transition(.opacity.combined(with: .scale))
+            .animation(.easeInOut, value: image)
         }
     }
 
@@ -176,8 +182,6 @@ struct ContentView: View {
                 .background(RoundedRectangle(cornerRadius: 12).fill(Color.green.opacity(0.1)))
                 .foregroundColor(.green)
                 .multilineTextAlignment(.center)
-        } else {
-            EmptyView()
         }
     }
 
@@ -213,8 +217,6 @@ struct ContentView: View {
                     }
                 }
             }
-        } else {
-            EmptyView()
         }
     }
 
@@ -231,57 +233,12 @@ struct ContentView: View {
     }
 
     private func clearImage() {
-        image = nil
-        selectedItem = nil
-        uploadResult = nil
-        matches = []
+        withAnimation(.easeInOut) {
+            image = nil
+            selectedItem = nil
+            uploadResult = nil
+            matches = []
+        }
     }
 }
-
-//// MARK: - CameraView with Flash Button Integrated
-//
-//struct CameraView: View {
-//    @Binding var image: UIImage?
-//    @Binding var flashOn: Bool
-//    @Environment(\.dismiss) private var dismiss
-//
-//    var body: some View {
-//        ZStack {
-//            Color.black.ignoresSafeArea() // Camera preview placeholder
-//
-//            VStack {
-//                HStack {
-//                    Spacer()
-//                    // Flash toggle button
-//                    Button {
-//                        flashOn.toggle()
-//                    } label: {
-//                        Image(systemName: flashOn ? "bolt.fill" : "bolt.slash.fill")
-//                            .foregroundColor(flashOn ? .yellow : .white)
-//                            .padding()
-//                            .background(Color.black.opacity(0.7))
-//                            .clipShape(Circle())
-//                    }
-//                    .padding()
-//                }
-//                Spacer()
-//            }
-//
-//            VStack {
-//                Spacer()
-//                Button(action: {
-//                    // Simulate capturing an image
-//                    image = UIImage(systemName: "person.crop.circle")
-//                    dismiss()
-//                }) {
-//                    Circle()
-//                        .fill(Color.white)
-//                        .frame(width: 70, height: 70)
-//                        .shadow(radius: 4)
-//                }
-//                .padding(.bottom, 40)
-//            }
-//        }
-//    }
-//}
 
