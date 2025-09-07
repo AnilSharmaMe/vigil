@@ -28,18 +28,18 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		AF254C752E5EE3860082FF87 /* vigil.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = vigil.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		AF254C852E5EE3880082FF87 /* vigilTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = vigilTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		AF254C8F2E5EE3880082FF87 /* vigilUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = vigilUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		AF254C752E5EE3860082FF87 /* Netra.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Netra.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		AF254C852E5EE3880082FF87 /* NetraTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NetraTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		AF254C8F2E5EE3880082FF87 /* NetraUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NetraUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		AF254CB32E5EF8FB0082FF87 /* Exceptions for "vigil" folder in "vigil" target */ = {
+		AF254CB32E5EF8FB0082FF87 /* Exceptions for "vigil" folder in "Netra" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
 			);
-			target = AF254C742E5EE3860082FF87 /* vigil */;
+			target = AF254C742E5EE3860082FF87 /* Netra */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
@@ -47,7 +47,7 @@
 		AF254C772E5EE3860082FF87 /* vigil */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				AF254CB32E5EF8FB0082FF87 /* Exceptions for "vigil" folder in "vigil" target */,
+				AF254CB32E5EF8FB0082FF87 /* Exceptions for "vigil" folder in "Netra" target */,
 			);
 			path = vigil;
 			sourceTree = "<group>";
@@ -103,9 +103,9 @@
 		AF254C762E5EE3860082FF87 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				AF254C752E5EE3860082FF87 /* vigil.app */,
-				AF254C852E5EE3880082FF87 /* vigilTests.xctest */,
-				AF254C8F2E5EE3880082FF87 /* vigilUITests.xctest */,
+				AF254C752E5EE3860082FF87 /* Netra.app */,
+				AF254C852E5EE3880082FF87 /* NetraTests.xctest */,
+				AF254C8F2E5EE3880082FF87 /* NetraUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -113,9 +113,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		AF254C742E5EE3860082FF87 /* vigil */ = {
+		AF254C742E5EE3860082FF87 /* Netra */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = AF254C992E5EE3880082FF87 /* Build configuration list for PBXNativeTarget "vigil" */;
+			buildConfigurationList = AF254C992E5EE3880082FF87 /* Build configuration list for PBXNativeTarget "Netra" */;
 			buildPhases = (
 				AF254C712E5EE3860082FF87 /* Sources */,
 				AF254C722E5EE3860082FF87 /* Frameworks */,
@@ -128,17 +128,17 @@
 			fileSystemSynchronizedGroups = (
 				AF254C772E5EE3860082FF87 /* vigil */,
 			);
-			name = vigil;
+			name = Netra;
 			packageProductDependencies = (
 				AF254CB02E5EF60E0082FF87 /* SwiftSoup */,
 			);
 			productName = vigil;
-			productReference = AF254C752E5EE3860082FF87 /* vigil.app */;
+			productReference = AF254C752E5EE3860082FF87 /* Netra.app */;
 			productType = "com.apple.product-type.application";
 		};
-		AF254C842E5EE3880082FF87 /* vigilTests */ = {
+		AF254C842E5EE3880082FF87 /* NetraTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = AF254C9C2E5EE3880082FF87 /* Build configuration list for PBXNativeTarget "vigilTests" */;
+			buildConfigurationList = AF254C9C2E5EE3880082FF87 /* Build configuration list for PBXNativeTarget "NetraTests" */;
 			buildPhases = (
 				AF254C812E5EE3880082FF87 /* Sources */,
 				AF254C822E5EE3880082FF87 /* Frameworks */,
@@ -152,16 +152,16 @@
 			fileSystemSynchronizedGroups = (
 				AF254C882E5EE3880082FF87 /* vigilTests */,
 			);
-			name = vigilTests;
+			name = NetraTests;
 			packageProductDependencies = (
 			);
 			productName = vigilTests;
-			productReference = AF254C852E5EE3880082FF87 /* vigilTests.xctest */;
+			productReference = AF254C852E5EE3880082FF87 /* NetraTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		AF254C8E2E5EE3880082FF87 /* vigilUITests */ = {
+		AF254C8E2E5EE3880082FF87 /* NetraUITests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = AF254C9F2E5EE3880082FF87 /* Build configuration list for PBXNativeTarget "vigilUITests" */;
+			buildConfigurationList = AF254C9F2E5EE3880082FF87 /* Build configuration list for PBXNativeTarget "NetraUITests" */;
 			buildPhases = (
 				AF254C8B2E5EE3880082FF87 /* Sources */,
 				AF254C8C2E5EE3880082FF87 /* Frameworks */,
@@ -175,11 +175,11 @@
 			fileSystemSynchronizedGroups = (
 				AF254C922E5EE3880082FF87 /* vigilUITests */,
 			);
-			name = vigilUITests;
+			name = NetraUITests;
 			packageProductDependencies = (
 			);
 			productName = vigilUITests;
-			productReference = AF254C8F2E5EE3880082FF87 /* vigilUITests.xctest */;
+			productReference = AF254C8F2E5EE3880082FF87 /* NetraUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
@@ -205,7 +205,7 @@
 					};
 				};
 			};
-			buildConfigurationList = AF254C702E5EE3850082FF87 /* Build configuration list for PBXProject "vigil" */;
+			buildConfigurationList = AF254C702E5EE3850082FF87 /* Build configuration list for PBXProject "Netra" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -222,9 +222,9 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				AF254C742E5EE3860082FF87 /* vigil */,
-				AF254C842E5EE3880082FF87 /* vigilTests */,
-				AF254C8E2E5EE3880082FF87 /* vigilUITests */,
+				AF254C742E5EE3860082FF87 /* Netra */,
+				AF254C842E5EE3880082FF87 /* NetraTests */,
+				AF254C8E2E5EE3880082FF87 /* NetraUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -280,12 +280,12 @@
 /* Begin PBXTargetDependency section */
 		AF254C872E5EE3880082FF87 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = AF254C742E5EE3860082FF87 /* vigil */;
+			target = AF254C742E5EE3860082FF87 /* Netra */;
 			targetProxy = AF254C862E5EE3880082FF87 /* PBXContainerItemProxy */;
 		};
 		AF254C912E5EE3880082FF87 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = AF254C742E5EE3860082FF87 /* vigil */;
+			target = AF254C742E5EE3860082FF87 /* Netra */;
 			targetProxy = AF254C902E5EE3880082FF87 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -487,7 +487,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/vigil.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/vigil";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Netra.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Netra";
 			};
 			name = Debug;
 		};
@@ -506,7 +506,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/vigil.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/vigil";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Netra.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Netra";
 			};
 			name = Release;
 		};
@@ -547,7 +547,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		AF254C702E5EE3850082FF87 /* Build configuration list for PBXProject "vigil" */ = {
+		AF254C702E5EE3850082FF87 /* Build configuration list for PBXProject "Netra" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				AF254C972E5EE3880082FF87 /* Debug */,
@@ -556,7 +556,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		AF254C992E5EE3880082FF87 /* Build configuration list for PBXNativeTarget "vigil" */ = {
+		AF254C992E5EE3880082FF87 /* Build configuration list for PBXNativeTarget "Netra" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				AF254C9A2E5EE3880082FF87 /* Debug */,
@@ -565,7 +565,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		AF254C9C2E5EE3880082FF87 /* Build configuration list for PBXNativeTarget "vigilTests" */ = {
+		AF254C9C2E5EE3880082FF87 /* Build configuration list for PBXNativeTarget "NetraTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				AF254C9D2E5EE3880082FF87 /* Debug */,
@@ -574,7 +574,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		AF254C9F2E5EE3880082FF87 /* Build configuration list for PBXNativeTarget "vigilUITests" */ = {
+		AF254C9F2E5EE3880082FF87 /* Build configuration list for PBXNativeTarget "NetraUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				AF254CA02E5EE3880082FF87 /* Debug */,

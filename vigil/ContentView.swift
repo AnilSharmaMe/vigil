@@ -3,7 +3,7 @@ import PhotosUI
 
 struct ContentView: View {
     @State private var showCamera = false
-    @State private var flashOn = false            // Flash toggle state
+    @State private var flashOn = false
     @State private var selectedItem: PhotosPickerItem? = nil
     @State private var image: UIImage? = nil
     @State private var isUploading = false
@@ -11,57 +11,53 @@ struct ContentView: View {
     @State private var matches: [FaceMatch] = []
 
     var body: some View {
-        NavigationStack {
-            VStack(alignment: .leading, spacing: 4) {
-                // Title + Tagline
-                Text("SecureScan")
-                    .font(.largeTitle.bold())
-                Text("Next-gen face recognition for peace of mind.")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding([.top, .horizontal])
-
-            ScrollView {
-                VStack(spacing: 24) {
-                    imageSection
-                    actionButtons
-                    resultSection
-                    matchesSection
+        ZStack {
+            NavigationStack {
+                VStack(alignment: .leading, spacing: 4) {
+                    // Title + Tagline
+                    Text("Netra")
+                        .font(.largeTitle.bold())
+                    Text("Your first layer of safety.")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
                 }
-                .padding()
-            }
-            .background(Color(.systemGroupedBackground).ignoresSafeArea())
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding([.top, .horizontal])
 
-            // Flash toggle outside camera sheet to avoid overlapping
-            HStack {
+                ScrollView {
+                    VStack(spacing: 24) {
+                        imageSection
+                        actionButtons
+                        resultSection
+                        matchesSection
+                    }
+                    .padding()
+                }
+                .background(Color(.systemGroupedBackground).ignoresSafeArea())
+            }
+            .sheet(isPresented: $showCamera) {
+                CameraView(image: $image, flashOn: $flashOn)
+            }
+
+            // Floating logo watermark
+            VStack {
+                HStack {
+                    Spacer()
+                    Image("logo") // Make sure logo is in Assets.xcassets
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 60, height: 60)
+                        .opacity(0.3)
+                        .padding()
+                }
                 Spacer()
-                Button {
-                    flashOn.toggle()
-                } label: {
-                    Image(systemName: flashOn ? "bolt.fill" : "bolt.slash.fill")
-                        .font(.title2)
-                        .padding(10)
-                        .background(Color.black.opacity(0.7))
-                        .clipShape(Circle())
-                        .foregroundColor(flashOn ? .yellow : .white)
-                }
-                .padding()
             }
-        }
-        .sheet(isPresented: $showCamera) {
-            CameraView(image: $image, flashOn: $flashOn)
         }
     }
-}
 
-// MARK: - Subviews
+    // MARK: - Subviews
 
-private extension ContentView {
-
-    // MARK: Image Display + Remove Button
-    var imageSection: some View {
+    private var imageSection: some View {
         VStack {
             if let image = image {
                 Image(uiImage: image)
@@ -98,8 +94,7 @@ private extension ContentView {
         .background(RoundedRectangle(cornerRadius: 16).fill(Color.white).shadow(radius: 3))
     }
 
-    // MARK: Action Buttons
-    var actionButtons: some View {
+    private var actionButtons: some View {
         VStack(spacing: 12) {
             Text("Choose an Image")
                 .font(.headline)
@@ -111,7 +106,7 @@ private extension ContentView {
         }
     }
 
-    var cameraButton: some View {
+    private var cameraButton: some View {
         Button(action: { showCamera = true }) {
             Label("Take Photo", systemImage: "camera")
                 .font(.headline)
@@ -123,7 +118,7 @@ private extension ContentView {
         }
     }
 
-    var galleryPicker: some View {
+    private var galleryPicker: some View {
         PhotosPicker(selection: $selectedItem, matching: .images, photoLibrary: .shared()) {
             Label("Pick from Gallery", systemImage: "photo")
                 .font(.headline)
@@ -133,18 +128,22 @@ private extension ContentView {
                 .foregroundColor(.white)
                 .clipShape(RoundedRectangle(cornerRadius: 12))
         }
-        .onChange(of: selectedItem) {
+        .onChange(of: selectedItem) { newItem in
             Task {
-                if let data = try? await selectedItem?.loadTransferable(type: Data.self),
-                   let uiImage = UIImage(data: data) {
-                    await MainActor.run { image = uiImage }
+                do {
+                    if let data = try await newItem?.loadTransferable(type: Data.self),
+                       let uiImage = UIImage(data: data) {
+                        await MainActor.run { image = uiImage }
+                    }
+                } catch {
+                    print("Error loading image: \(error)")
                 }
             }
         }
     }
 
     @ViewBuilder
-    var compareButton: some View {
+    private var compareButton: some View {
         if let image {
             Button {
                 Task { await runFaceComparison(for: image) }
@@ -168,9 +167,8 @@ private extension ContentView {
         }
     }
 
-    // MARK: Upload Result
     @ViewBuilder
-    var resultSection: some View {
+    private var resultSection: some View {
         if let result = uploadResult {
             Text(result)
                 .padding()
@@ -183,50 +181,46 @@ private extension ContentView {
         }
     }
 
-    // MARK: Matches List
     @ViewBuilder
-    var matchesSection: some View {
+    private var matchesSection: some View {
         if !matches.isEmpty {
             VStack(alignment: .leading, spacing: 8) {
                 Text("Matches")
                     .font(.headline)
                     .padding(.bottom, 4)
 
-                ScrollView {
-                    LazyVStack(spacing: 12) {
-                        ForEach(matches) { match in
-                            HStack(spacing: 12) {
-                                Image(uiImage: match.image)
-                                    .resizable()
-                                    .frame(width: 60, height: 60)
-                                    .clipShape(RoundedRectangle(cornerRadius: 8))
-                                    .shadow(radius: 2)
+                LazyVStack(spacing: 12) {
+                    ForEach(matches) { match in
+                        HStack(spacing: 12) {
+                            Image(uiImage: match.image)
+                                .resizable()
+                                .frame(width: 60, height: 60)
+                                .clipShape(RoundedRectangle(cornerRadius: 8))
+                                .shadow(radius: 2)
 
-                                VStack(alignment: .leading, spacing: 4) {
-                                    Text(match.key)
-                                        .font(.headline)
-                                    Text("Similarity: \(String(format: "%.2f", match.similarity))")
-                                        .font(.subheadline)
-                                        .foregroundColor(.secondary)
-                                }
-                                Spacer()
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(match.key)
+                                    .font(.headline)
+                                Text("Similarity: \(String(format: "%.2f", match.similarity))")
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
                             }
-                            .padding()
-                            .background(RoundedRectangle(cornerRadius: 12).fill(Color(.systemBackground)))
-                            .shadow(color: Color.black.opacity(0.05), radius: 3, x: 0, y: 2)
+                            Spacer()
                         }
+                        .padding()
+                        .background(RoundedRectangle(cornerRadius: 12).fill(Color(.systemBackground)))
+                        .shadow(color: Color.black.opacity(0.05), radius: 3, x: 0, y: 2)
                     }
-                    .padding(.horizontal)
                 }
-                .frame(maxHeight: 300)
             }
         } else {
             EmptyView()
         }
     }
 
-    // MARK: Face Comparison Logic
-    func runFaceComparison(for image: UIImage) async {
+    // MARK: - Functions
+
+    private func runFaceComparison(for image: UIImage) async {
         await MainActor.run { isUploading = true }
         FaceCompare.shared.compareFaces(image: image)
         await MainActor.run {
@@ -236,12 +230,58 @@ private extension ContentView {
         }
     }
 
-    // MARK: Clear Image and Reset State
-    func clearImage() {
+    private func clearImage() {
         image = nil
         selectedItem = nil
         uploadResult = nil
         matches = []
     }
 }
+
+//// MARK: - CameraView with Flash Button Integrated
+//
+//struct CameraView: View {
+//    @Binding var image: UIImage?
+//    @Binding var flashOn: Bool
+//    @Environment(\.dismiss) private var dismiss
+//
+//    var body: some View {
+//        ZStack {
+//            Color.black.ignoresSafeArea() // Camera preview placeholder
+//
+//            VStack {
+//                HStack {
+//                    Spacer()
+//                    // Flash toggle button
+//                    Button {
+//                        flashOn.toggle()
+//                    } label: {
+//                        Image(systemName: flashOn ? "bolt.fill" : "bolt.slash.fill")
+//                            .foregroundColor(flashOn ? .yellow : .white)
+//                            .padding()
+//                            .background(Color.black.opacity(0.7))
+//                            .clipShape(Circle())
+//                    }
+//                    .padding()
+//                }
+//                Spacer()
+//            }
+//
+//            VStack {
+//                Spacer()
+//                Button(action: {
+//                    // Simulate capturing an image
+//                    image = UIImage(systemName: "person.crop.circle")
+//                    dismiss()
+//                }) {
+//                    Circle()
+//                        .fill(Color.white)
+//                        .frame(width: 70, height: 70)
+//                        .shadow(radius: 4)
+//                }
+//                .padding(.bottom, 40)
+//            }
+//        }
+//    }
+//}
 
