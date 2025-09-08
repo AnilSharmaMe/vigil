@@ -23,7 +23,7 @@ struct ContentView: View {
                             .frame(maxHeight: 300)
                             .clipShape(RoundedRectangle(cornerRadius: 16))
                             .shadow(radius: 4)
-                        
+
                         // Remove photo overlay
                         Button(action: { clearImage() }) {
                             Image(systemName: "xmark.circle.fill")
@@ -48,20 +48,33 @@ struct ContentView: View {
                     }
                 }
 
-                // MARK: - Choose Image Button
-                Button("Choose Image") {
-                    showImageMenu = true
-                }
-                .font(.headline)
-                .padding()
-                .frame(maxWidth: .infinity)
-                .background(Color.blue)
-                .foregroundColor(.white)
-                .clipShape(RoundedRectangle(cornerRadius: 12))
-                .confirmationDialog("Select Image", isPresented: $showImageMenu, titleVisibility: .visible) {
-                    Button("Take Photo") { showCamera = true }
-                    Button("Pick from Gallery") { showGallery = true }
-                    Button("Cancel", role: .cancel) { }
+                // MARK: - Select Image Button
+                if image == nil {
+                    Button(action: { showImageMenu = true }) {
+                        HStack {
+                            Image(systemName: "photo.fill.on.rectangle.fill")
+                                .font(.headline)
+                            Text("Select Image")
+                                .font(.headline)
+                        }
+                        .foregroundColor(.white)
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(
+                            LinearGradient(
+                                colors: [Color.blue.opacity(0.7), Color.blue.opacity(0.4)],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .clipShape(RoundedRectangle(cornerRadius: 14))
+                        .shadow(radius: 4)
+                    }
+                    .sheet(isPresented: $showImageMenu) {
+                        ImageMenuSheet(showCamera: $showCamera,
+                                       showGallery: $showGallery,
+                                       isPresented: $showImageMenu)
+                    }
                 }
 
                 // MARK: - Compare Button
@@ -76,9 +89,13 @@ struct ContentView: View {
                                 .font(.headline)
                                 .padding()
                                 .frame(maxWidth: .infinity)
-                                .background(Color.green)
+                                .background(
+                                    LinearGradient(colors: [Color.green.opacity(0.7), Color.green.opacity(0.4)],
+                                                   startPoint: .leading,
+                                                   endPoint: .trailing)
+                                )
                                 .foregroundColor(.white)
-                                .clipShape(RoundedRectangle(cornerRadius: 12))
+                                .clipShape(RoundedRectangle(cornerRadius: 14))
                         }
                     }
                     .transition(.opacity)
@@ -99,7 +116,7 @@ struct ContentView: View {
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Matches")
                             .font(.headline)
-                        
+
                         ScrollView {
                             LazyVStack(spacing: 12) {
                                 ForEach(matches) { match in
@@ -162,6 +179,75 @@ struct ContentView: View {
         matches = FaceCompare.shared.matches
         resultMessage = FaceCompare.shared.resultMessage
         isComparing = false
+    }
+}
+
+// MARK: - Bottom Sheet for Image Selection
+struct ImageMenuSheet: View {
+    @Binding var showCamera: Bool
+    @Binding var showGallery: Bool
+    @Binding var isPresented: Bool
+
+    var body: some View {
+        VStack(spacing: 16) {
+            Capsule()
+                .fill(Color.gray.opacity(0.4))
+                .frame(width: 40, height: 5)
+                .padding(.top, 8)
+
+            Spacer()
+
+            Button {
+                showCamera = true
+                isPresented = false
+            } label: {
+                HStack {
+                    Image(systemName: "camera.fill")
+                    Text("Take Photo")
+                        .fontWeight(.semibold)
+                }
+                .foregroundColor(.white)
+                .padding()
+                .frame(maxWidth: .infinity)
+                .background(
+                    LinearGradient(colors: [Color.blue.opacity(0.7), Color.blue.opacity(0.4)],
+                                   startPoint: .leading,
+                                   endPoint: .trailing)
+                )
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+            }
+
+            Button {
+                showGallery = true
+                isPresented = false
+            } label: {
+                HStack {
+                    Image(systemName: "photo.fill")
+                    Text("Pick from Gallery")
+                        .fontWeight(.semibold)
+                }
+                .foregroundColor(.white)
+                .padding()
+                .frame(maxWidth: .infinity)
+                .background(
+                    LinearGradient(colors: [Color.blue.opacity(0.6), Color.blue.opacity(0.3)],
+                                   startPoint: .leading,
+                                   endPoint: .trailing)
+                )
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+            }
+
+            Button("Cancel") {
+                isPresented = false
+            }
+            .foregroundColor(.red)
+            .padding(.top)
+
+            Spacer()
+        }
+        .padding()
+        .presentationDetents([.medium])
+        .background(Color(.systemBackground))
     }
 }
 
