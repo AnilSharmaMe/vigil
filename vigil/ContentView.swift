@@ -1,5 +1,7 @@
 import SwiftUI
 import PhotosUI
+import CoreLocation
+import UserNotifications
 
 struct ContentView: View {
     @State private var image: UIImage? = nil
@@ -11,6 +13,7 @@ struct ContentView: View {
     @State private var matches: [FaceMatch] = []
     @State private var resultMessage: String? = nil
     @State private var glowAnimation = false
+    @StateObject private var locationManager = LocationManager()
 
     var body: some View {
         NavigationStack {
@@ -49,19 +52,16 @@ struct ContentView: View {
                     }
                 }
 
-                // MARK: - Action Buttons (only when no image yet)
+                // MARK: - Action Buttons (when no image)
                 if image == nil {
                     VStack(spacing: 16) {
-                        // First button with bottom sheet
                         Button(action: { showImageMenu = true }) {
                             ZStack {
                                 RoundedRectangle(cornerRadius: 16)
                                     .fill(
-                                        LinearGradient(
-                                            colors: [Color.cyan.opacity(0.6), Color.cyan.opacity(0.3)],
-                                            startPoint: .leading,
-                                            endPoint: .trailing
-                                        )
+                                        LinearGradient(colors: [Color.cyan.opacity(0.6), Color.cyan.opacity(0.3)],
+                                                       startPoint: .leading,
+                                                       endPoint: .trailing)
                                     )
                                     .frame(height: 55)
                                     .shadow(color: Color.cyan.opacity(0.5), radius: glowAnimation ? 15 : 6)
@@ -84,16 +84,13 @@ struct ContentView: View {
                                            isPresented: $showImageMenu)
                         }
 
-                        // Second button: direct gallery
                         Button(action: { showGallery = true }) {
                             ZStack {
                                 RoundedRectangle(cornerRadius: 16)
                                     .fill(
-                                        LinearGradient(
-                                            colors: [Color.purple.opacity(0.6), Color.purple.opacity(0.3)],
-                                            startPoint: .leading,
-                                            endPoint: .trailing
-                                        )
+                                        LinearGradient(colors: [Color.purple.opacity(0.6), Color.purple.opacity(0.3)],
+                                                       startPoint: .leading,
+                                                       endPoint: .trailing)
                                     )
                                     .frame(height: 55)
                                     .shadow(color: Color.purple.opacity(0.5), radius: glowAnimation ? 15 : 6)
@@ -177,6 +174,17 @@ struct ContentView: View {
                             }
                         }
                         .frame(maxHeight: 200)
+
+                        // MARK: - Notify Users Button
+                        Button(action: { notifyUsers() }) {
+                            Text("Notify Nearby Users")
+                                .font(.headline)
+                                .padding()
+                                .frame(maxWidth: .infinity)
+                                .background(Color.red)
+                                .foregroundColor(.white)
+                                .clipShape(RoundedRectangle(cornerRadius: 14))
+                        }
                     }
                 }
 
@@ -198,8 +206,10 @@ struct ContentView: View {
                 }
             }
         }
+        .onAppear { NotificationManager.shared.requestPermission() }
     }
 
+    // MARK: - Helper Methods
     private func clearImage() {
         image = nil
         selectedItem = nil
@@ -214,74 +224,45 @@ struct ContentView: View {
         resultMessage = FaceCompare.shared.resultMessage
         isComparing = false
     }
-}
 
-// MARK: - Modern Bottom Sheet
-struct ImageMenuSheet: View {
-    @Binding var showCamera: Bool
-    @Binding var showGallery: Bool
-    @Binding var isPresented: Bool
-
-    var body: some View {
-        VStack(spacing: 16) {
-            Capsule()
-                .fill(Color.gray.opacity(0.4))
-                .frame(width: 40, height: 5)
-                .padding(.top, 8)
-
-            Spacer()
-
-            Button {
-                showCamera = true
-                isPresented = false
-            } label: {
-                HStack {
-                    Image(systemName: "camera.fill")
-                    Text("Capture Photo")
-                        .fontWeight(.semibold)
-                }
-                .foregroundColor(.white)
-                .padding()
-                .frame(maxWidth: .infinity)
-                .background(
-                    LinearGradient(colors: [Color.cyan.opacity(0.7), Color.cyan.opacity(0.4)],
-                                   startPoint: .leading,
-                                   endPoint: .trailing)
-                )
-                .clipShape(RoundedRectangle(cornerRadius: 12))
-            }
-
-            Button {
-                showGallery = true
-                isPresented = false
-            } label: {
-                HStack {
-                    Image(systemName: "photo.fill")
-                    Text("Pick from Gallery")
-                        .fontWeight(.semibold)
-                }
-                .foregroundColor(.white)
-                .padding()
-                .frame(maxWidth: .infinity)
-                .background(
-                    LinearGradient(colors: [Color.cyan.opacity(0.6), Color.cyan.opacity(0.3)],
-                                   startPoint: .leading,
-                                   endPoint: .trailing)
-                )
-                .clipShape(RoundedRectangle(cornerRadius: 12))
-            }
-
-            Button("Cancel") {
-                isPresented = false
-            }
-            .foregroundColor(.red)
-            .padding(.top)
-
-            Spacer()
-        }
-        .padding()
-        .presentationDetents([.medium])
-        .background(Color(.systemBackground))
+    private func notifyUsers() {
+        guard let match = matches.first else { return }
+        let lat = locationManager.location?.coordinate.latitude ?? 0
+        let lng = locationManager.location?.coordinate.longitude ?? 0
+        print("Sending notification for match at location: (\(lat), \(lng))")
+        NotificationManager.shared.sendMatchNotification(with: match)
     }
+    
+    private func savePersonToFolder() {
+            guard let selectedImage = image else { return }
+            let name = folderName.isEmpty ? "Person_\(Date().timeIntervalSince1970)" : folderName
+
+            // Create folder
+            let folderURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+                .appendingPathComponent(name)
+            if !FileManager.default.fileExists(atPath: folderURL.path) {
+                try? FileManager.default.createDirectory(at: folderURL, withIntermediateDirectories: true)
+            }
+
+            // Save image
+            let imageURL = folderURL.appendingPathComponent("face.jpg")
+            if let data = selectedImage.jpegData(compressionQuality: 0.9) {
+                try? data.write(to: imageURL)
+            }
+
+            // Generate embedding
+            if let alignedFace = WantedPersonServiceManager.shared.alignFace(from: selectedImage),
+               let embedding = FaceEmbedding.shared?.embedding(for: alignedFace) {
+                let normalized = WantedPersonServiceManager.shared.normalize(embedding)
+                _ = EmbeddingStore.shared.save(normalized, image: alignedFace, folder: folderURL)
+                print("✅ Saved person with folder: \(name)")
+            } else {
+                print("⚠️ Could not generate embedding")
+            }
+
+            // Reset
+            clearImage()
+        }
+
 }
 
