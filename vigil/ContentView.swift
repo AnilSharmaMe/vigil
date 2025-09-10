@@ -10,10 +10,12 @@ struct ContentView: View {
     @State private var isComparing = false
     @State private var matches: [FaceMatch] = []
     @State private var resultMessage: String? = nil
+    @State private var glowAnimation = false
 
     var body: some View {
         NavigationStack {
             VStack(spacing: 24) {
+
                 // MARK: - Image Display
                 ZStack(alignment: .topTrailing) {
                     if let image {
@@ -24,7 +26,6 @@ struct ContentView: View {
                             .clipShape(RoundedRectangle(cornerRadius: 16))
                             .shadow(radius: 4)
 
-                        // Remove photo overlay
                         Button(action: { clearImage() }) {
                             Image(systemName: "xmark.circle.fill")
                                 .foregroundColor(.white)
@@ -48,36 +49,71 @@ struct ContentView: View {
                     }
                 }
 
-                // MARK: - Select Image Button
+                // MARK: - Action Buttons (only when no image yet)
                 if image == nil {
-                    Button(action: { showImageMenu = true }) {
-                        HStack {
-                            Image(systemName: "photo.fill.on.rectangle.fill")
-                                .font(.headline)
-                            Text("Select Image")
-                                .font(.headline)
+                    VStack(spacing: 16) {
+                        // First button with bottom sheet
+                        Button(action: { showImageMenu = true }) {
+                            ZStack {
+                                RoundedRectangle(cornerRadius: 16)
+                                    .fill(
+                                        LinearGradient(
+                                            colors: [Color.cyan.opacity(0.6), Color.cyan.opacity(0.3)],
+                                            startPoint: .leading,
+                                            endPoint: .trailing
+                                        )
+                                    )
+                                    .frame(height: 55)
+                                    .shadow(color: Color.cyan.opacity(0.5), radius: glowAnimation ? 15 : 6)
+                                    .animation(.easeInOut(duration: 1).repeatForever(autoreverses: true), value: glowAnimation)
+
+                                HStack(spacing: 12) {
+                                    Image(systemName: "scope")
+                                        .font(.headline)
+                                        .foregroundColor(.white)
+                                    Text("Start Recognition")
+                                        .font(.headline)
+                                        .foregroundColor(.white)
+                                }
+                            }
                         }
-                        .foregroundColor(.white)
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(
-                            LinearGradient(
-                                colors: [Color.blue.opacity(0.7), Color.blue.opacity(0.4)],
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
-                        )
-                        .clipShape(RoundedRectangle(cornerRadius: 14))
-                        .shadow(radius: 4)
-                    }
-                    .sheet(isPresented: $showImageMenu) {
-                        ImageMenuSheet(showCamera: $showCamera,
-                                       showGallery: $showGallery,
-                                       isPresented: $showImageMenu)
+                        .onAppear { glowAnimation = true }
+                        .sheet(isPresented: $showImageMenu) {
+                            ImageMenuSheet(showCamera: $showCamera,
+                                           showGallery: $showGallery,
+                                           isPresented: $showImageMenu)
+                        }
+
+                        // Second button: direct gallery
+                        Button(action: { showGallery = true }) {
+                            ZStack {
+                                RoundedRectangle(cornerRadius: 16)
+                                    .fill(
+                                        LinearGradient(
+                                            colors: [Color.purple.opacity(0.6), Color.purple.opacity(0.3)],
+                                            startPoint: .leading,
+                                            endPoint: .trailing
+                                        )
+                                    )
+                                    .frame(height: 55)
+                                    .shadow(color: Color.purple.opacity(0.5), radius: glowAnimation ? 15 : 6)
+                                    .animation(.easeInOut(duration: 1).repeatForever(autoreverses: true), value: glowAnimation)
+
+                                HStack(spacing: 12) {
+                                    Image(systemName: "photo.fill")
+                                        .font(.headline)
+                                        .foregroundColor(.white)
+                                    Text("Add Person in detection list")
+                                        .font(.headline)
+                                        .foregroundColor(.white)
+                                }
+                            }
+                        }
+                        .onAppear { glowAnimation = true }
                     }
                 }
 
-                // MARK: - Compare Button
+                // MARK: - Compare Faces Button
                 if let image {
                     Button(action: { runFaceComparison(for: image) }) {
                         if isComparing {
@@ -150,7 +186,6 @@ struct ContentView: View {
             .navigationTitle("Netra")
             .navigationBarTitleDisplayMode(.inline)
         }
-        // MARK: - Sheets and Pickers
         .sheet(isPresented: $showCamera) {
             CameraView(image: $image, flashOn: .constant(false))
         }
@@ -165,7 +200,6 @@ struct ContentView: View {
         }
     }
 
-    // MARK: - Functions
     private func clearImage() {
         image = nil
         selectedItem = nil
@@ -182,7 +216,7 @@ struct ContentView: View {
     }
 }
 
-// MARK: - Bottom Sheet for Image Selection
+// MARK: - Modern Bottom Sheet
 struct ImageMenuSheet: View {
     @Binding var showCamera: Bool
     @Binding var showGallery: Bool
@@ -203,14 +237,14 @@ struct ImageMenuSheet: View {
             } label: {
                 HStack {
                     Image(systemName: "camera.fill")
-                    Text("Take Photo")
+                    Text("Capture Photo")
                         .fontWeight(.semibold)
                 }
                 .foregroundColor(.white)
                 .padding()
                 .frame(maxWidth: .infinity)
                 .background(
-                    LinearGradient(colors: [Color.blue.opacity(0.7), Color.blue.opacity(0.4)],
+                    LinearGradient(colors: [Color.cyan.opacity(0.7), Color.cyan.opacity(0.4)],
                                    startPoint: .leading,
                                    endPoint: .trailing)
                 )
@@ -230,7 +264,7 @@ struct ImageMenuSheet: View {
                 .padding()
                 .frame(maxWidth: .infinity)
                 .background(
-                    LinearGradient(colors: [Color.blue.opacity(0.6), Color.blue.opacity(0.3)],
+                    LinearGradient(colors: [Color.cyan.opacity(0.6), Color.cyan.opacity(0.3)],
                                    startPoint: .leading,
                                    endPoint: .trailing)
                 )
