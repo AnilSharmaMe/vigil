@@ -12,12 +12,14 @@ enum EmbeddingCategory {
     case regular
     case retail
     case unsolved
+    case userCustom
 
     var folder: URL {
         switch self {
         case .regular: return EmbeddingStore.imagesDirectory
         case .retail: return EmbeddingStore.retailImagesDirectory
         case .unsolved: return EmbeddingStore.unknownWantedImagesDirectory
+        case .userCustom: return EmbeddingStore.userCustomDirectory
         }
     }
 
@@ -26,6 +28,7 @@ enum EmbeddingCategory {
         case .regular: return EmbeddingStore.imagesFile
         case .retail: return EmbeddingStore.retailImagesFile
         case .unsolved: return EmbeddingStore.unknownImagesFile
+        case .userCustom: return EmbeddingStore.userCustomFile
         }
     }
 }
@@ -156,11 +159,14 @@ class EmbeddingStore {
     static let imagesFile = documentsURL().appendingPathComponent("WantedFaces.json")
     static let retailImagesFile = documentsURL().appendingPathComponent("RetailWantedFaces.json")
     static let unknownImagesFile = documentsURL().appendingPathComponent("UnknownWantedFaces.json")
+    static let userCustomFile = documentsURL().appendingPathComponent("UserCustomFaces.json")
 
     static let imagesDirectory: URL = documentsURL().appendingPathComponent("WantedFaces")
     static let retailImagesDirectory: URL = documentsURL().appendingPathComponent("RetailWantedFaces")
     static let unknownWantedImagesDirectory: URL = documentsURL().appendingPathComponent("UnknownWantedFaces")
     static let comparisonDirectory: URL = documentsURL().appendingPathComponent("ComparisonFaces")
+    static let userCustomDirectory: URL = documentsURL().appendingPathComponent("UserCustomFaces")
+
 
     private static func documentsURL() -> URL {
         return FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!

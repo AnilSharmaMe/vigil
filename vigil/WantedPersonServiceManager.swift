@@ -216,7 +216,7 @@ class WantedPersonServiceManager {
     }
 
     // MARK: - Normalize embedding
-    private func normalize(_ vector: [Float]) -> [Float] {
+    func normalize(_ vector: [Float]) -> [Float] {
         let norm = sqrt(vector.map { $0 * $0 }.reduce(0, +))
         return vector.map { $0 / (norm + 1e-10) }
     }

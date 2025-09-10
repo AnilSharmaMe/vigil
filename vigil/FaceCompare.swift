@@ -164,6 +164,7 @@ class FaceCompare {
 
 // MARK: - UIImage helpers
 extension UIImage {
+
     func rotated(by radians: CGFloat) -> UIImage? {
         let rotatedSize = CGRect(origin: .zero, size: size)
             .applying(CGAffineTransform(rotationAngle: radians))
