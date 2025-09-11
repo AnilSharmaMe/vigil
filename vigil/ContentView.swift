@@ -9,8 +9,9 @@ struct ContentView: View {
     @State private var personToAdd: UIImage? = nil               // Add Person preview
 
     @State private var showCamera = false
-    @State private var showRecognitionMenu = false
+    @State private var showRecognitionOptions = false
     @State private var showRecognitionPicker = false
+    @State private var showAddPersonOptions = false
     @State private var showAddPersonPicker = false
 
     @State private var recognitionPickerItem: PhotosPickerItem? = nil
@@ -26,197 +27,239 @@ struct ContentView: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 24) {
-                
-                // MARK: - Logo & Tagline
-                VStack(spacing: 6) {
-                    Image("app_logo")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 120, height: 120)
-                        .shadow(radius: 6)
-                    
-                    Text("Identify • Verify • Protect")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                }
-                .padding(.top, 12)
-                
+
+                // MARK: - Tagline
+                Text("Identify. Verify. Protect.")
+                    .font(.headline)
+                    .foregroundColor(.gray)
+                    .padding(.top, 8)
+
+                // MARK: - Logo at top
+                Image("app_logo") // Replace with your actual asset name
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 120, height: 120)
+
+                Spacer()
+
                 // MARK: - Image / Person Preview
-                ZStack(alignment: .topLeading) {
+                ZStack(alignment: .topTrailing) {
                     if let imageToShow = personToAdd ?? image {
                         Image(uiImage: imageToShow)
                             .resizable()
                             .scaledToFit()
-                            .frame(height: 250)
-                            .clipShape(RoundedRectangle(cornerRadius: 20))
+                            .frame(maxHeight: 300)
+                            .clipShape(RoundedRectangle(cornerRadius: 16))
                             .shadow(radius: 4)
-                            .overlay(alignment: .topLeading) {
-                                Text(personToAdd != nil ? "New Person" : "Recognition Image")
-                                    .font(.caption)
-                                    .padding(6)
-                                    .background(Color.black.opacity(0.6))
-                                    .foregroundColor(.white)
-                                    .clipShape(Capsule())
-                                    .padding(8)
-                            }
-                            .overlay(alignment: .topTrailing) {
-                                Button(action: { clearImage() }) {
-                                    Image(systemName: "xmark.circle.fill")
-                                        .font(.title2)
-                                        .foregroundColor(.white)
-                                        .shadow(radius: 2)
-                                }
-                                .padding(8)
-                            }
+
+                        Button(action: { clearImage() }) {
+                            Image(systemName: "xmark.circle.fill")
+                                .foregroundColor(.white)
+                                .background(Circle().fill(Color.black.opacity(0.5)))
+                        }
+                        .padding(8)
                     } else {
-                        VStack(spacing: 12) {
+                        VStack(spacing: 16) {
                             Image(systemName: "photo.on.rectangle.angled")
                                 .resizable()
                                 .scaledToFit()
-                                .frame(width: 70, height: 70)
-                                .foregroundColor(.gray.opacity(0.4))
+                                .frame(width: 80, height: 80)
+                                .foregroundColor(.gray.opacity(0.5))
                             Text("No image selected")
                                 .font(.headline)
-                                .foregroundColor(.secondary)
+                                .foregroundColor(.gray)
                         }
-                        .frame(maxWidth: .infinity, minHeight: 220)
-                        .background(RoundedRectangle(cornerRadius: 20).fill(Color(.systemGray6)))
+                        .frame(maxWidth: .infinity, minHeight: 200)
+                        .background(RoundedRectangle(cornerRadius: 16).fill(Color(.systemGray6)))
                         .shadow(radius: 2)
                     }
                 }
-                
-                // MARK: - Add Person Flow
+
+                // MARK: - Add Person Preview Flow
                 if let person = personToAdd {
-                    VStack(spacing: 12) {
+                    VStack(spacing: 16) {
                         Text("Add this person to detection list?")
                             .font(.headline)
-                        
+
+                        Image(uiImage: person)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(maxHeight: 300)
+                            .clipShape(RoundedRectangle(cornerRadius: 16))
+                            .shadow(radius: 4)
+
                         HStack(spacing: 16) {
                             Button(action: { personToAdd = nil }) {
                                 Text("Cancel")
-                                    .font(.headline)
+                                    .foregroundColor(.white)
                                     .frame(maxWidth: .infinity)
                                     .padding()
                                     .background(Color.gray)
-                                    .foregroundColor(.white)
-                                    .clipShape(Capsule())
+                                    .clipShape(RoundedRectangle(cornerRadius: 14))
                             }
-                            
+
                             Button(action: { savePersonToFolder(image: person) }) {
                                 Text("Add")
-                                    .font(.headline)
+                                    .foregroundColor(.white)
                                     .frame(maxWidth: .infinity)
                                     .padding()
                                     .background(Color.blue)
-                                    .foregroundColor(.white)
-                                    .clipShape(Capsule())
+                                    .clipShape(RoundedRectangle(cornerRadius: 14))
                             }
                         }
                     }
                 }
-                
-                // MARK: - Action Buttons (only when no selection active)
+
+                // MARK: - Action Buttons (only when no image or person selected)
                 if image == nil && personToAdd == nil {
                     VStack(spacing: 16) {
-                        Button(action: { showRecognitionMenu = true }) {
-                            actionButton(title: "Start Recognition", icon: "scope", colors: [Color.cyan, Color.blue], glow: true)
+
+                        // Start Recognition
+                        VStack(spacing: 8) {
+                            Button(action: { withAnimation { showRecognitionOptions.toggle() } }) {
+                                actionButton(title: "Start Recognition",
+                                             icon: "scope",
+                                             colors: [Color.cyan.opacity(0.6), Color.cyan.opacity(0.3)],
+                                             glow: true)
+                            }
+                            if showRecognitionOptions {
+                                VStack(spacing: 8) {
+                                    Button(action: { showCamera = true }) {
+                                        actionButton(title: "Pick from Camera",
+                                                     icon: "camera.fill",
+                                                     colors: [Color.blue.opacity(0.4)],
+                                                     glow: false,
+                                                     isChild: true)
+                                            .padding(.leading, 20)
+                                    }
+                                    Button(action: { showRecognitionPicker = true }) {
+                                        actionButton(title: "Pick from Gallery",
+                                                     icon: "photo.fill.on.rectangle.fill",
+                                                     colors: [Color.orange.opacity(0.4)],
+                                                     glow: false,
+                                                     isChild: true)
+                                            .padding(.leading, 20)
+                                    }
+                                }
+                                .transition(.opacity.combined(with: .move(edge: .top)))
+                            }
                         }
-                        .confirmationDialog("Start Recognition", isPresented: $showRecognitionMenu, titleVisibility: .visible) {
-                            Button("Pick from Camera", action: { showCamera = true })
-                            Button("Pick from Gallery", action: { showRecognitionPicker = true })
-                            Button("Cancel", role: .cancel) {}
-                        }
-                        
-                        Button(action: { showAddPersonPicker = true }) {
-                            actionButton(title: "Add Person in detection list", icon: "person.crop.circle.badge.plus", colors: [Color.purple, Color.pink], glow: true)
+
+                        // Add Person
+                        VStack(spacing: 8) {
+                            Button(action: { withAnimation { showAddPersonOptions.toggle() } }) {
+                                actionButton(title: "Add Person in detection list",
+                                             icon: "person.crop.circle.badge.plus",
+                                             colors: [Color.purple.opacity(0.6), Color.purple.opacity(0.3)],
+                                             glow: true)
+                            }
+                            if showAddPersonOptions {
+                                VStack(spacing: 8) {
+                                    Button(action: { showAddPersonPicker = true }) {
+                                        actionButton(title: "Pick from Gallery",
+                                                     icon: "photo.on.rectangle.angled",
+                                                     colors: [Color.gray.opacity(0.3)],
+                                                     glow: false,
+                                                     isChild: true)
+                                            .padding(.leading, 20)
+                                    }
+                                }
+                                .transition(.opacity.combined(with: .move(edge: .top)))
+                            }
                         }
                     }
                 }
-                
-                // MARK: - Compare Faces (Recognition flow)
+
+                // MARK: - Compare Faces Button (only for recognition image)
                 if let recognitionImage = image, personToAdd == nil {
                     Button(action: { runFaceComparison(for: recognitionImage) }) {
                         if isComparing {
-                            ProgressView().frame(maxWidth: .infinity)
+                            ProgressView()
+                                .frame(maxWidth: .infinity)
+                                .padding()
                         } else {
                             Text("Compare Faces")
                                 .font(.headline)
-                                .frame(maxWidth: .infinity)
                                 .padding()
-                                .background(LinearGradient(colors: [Color.green, Color.teal],
-                                                           startPoint: .leading,
-                                                           endPoint: .trailing))
+                                .frame(maxWidth: .infinity)
+                                .background(
+                                    LinearGradient(colors: [Color.green.opacity(0.7), Color.green.opacity(0.4)],
+                                                   startPoint: .leading,
+                                                   endPoint: .trailing)
+                                )
                                 .foregroundColor(.white)
-                                .clipShape(Capsule())
+                                .clipShape(RoundedRectangle(cornerRadius: 14))
                         }
                     }
+                    .transition(.opacity)
                 }
-                
+
                 // MARK: - Result Message
                 if let resultMessage {
                     Text(resultMessage)
                         .padding()
                         .frame(maxWidth: .infinity)
-                        .background(RoundedRectangle(cornerRadius: 14).fill(Color.green.opacity(0.15)))
+                        .background(RoundedRectangle(cornerRadius: 12).fill(Color.green.opacity(0.1)))
                         .foregroundColor(.green)
                         .multilineTextAlignment(.center)
                 }
-                
+
                 // MARK: - Matches List
                 if !matches.isEmpty {
-                    VStack(alignment: .leading, spacing: 12) {
+                    VStack(alignment: .leading, spacing: 8) {
                         Text("Matches")
                             .font(.headline)
-                        
+
                         ScrollView {
                             LazyVStack(spacing: 12) {
                                 ForEach(matches) { match in
-                                    VStack(alignment: .leading, spacing: 8) {
-                                        HStack(spacing: 12) {
-                                            Image(uiImage: match.image)
-                                                .resizable()
-                                                .frame(width: 60, height: 60)
-                                                .clipShape(RoundedRectangle(cornerRadius: 10))
-                                            
-                                            VStack(alignment: .leading, spacing: 4) {
-                                                Text(match.key)
-                                                    .font(.subheadline)
-                                                similarityBar(value: match.similarity)
-                                            }
-                                            Spacer()
+                                    HStack(spacing: 12) {
+                                        Image(uiImage: match.image)
+                                            .resizable()
+                                            .frame(width: 60, height: 60)
+                                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                                        VStack(alignment: .leading, spacing: 4) {
+                                            Text(match.key)
+                                                .font(.headline)
+                                            Text("Similarity: \(String(format: "%.2f", match.similarity))")
+                                                .font(.subheadline)
+                                                .foregroundColor(.secondary)
                                         }
+                                        Spacer()
                                     }
                                     .padding()
-                                    .background(RoundedRectangle(cornerRadius: 16).fill(Color(.systemBackground)))
+                                    .background(RoundedRectangle(cornerRadius: 12).fill(Color(.systemBackground)))
                                     .shadow(color: Color.black.opacity(0.05), radius: 3, x: 0, y: 2)
                                 }
                             }
                         }
                         .frame(maxHeight: 200)
-                        
+
                         Button(action: { notifyUsers() }) {
-                            Label("Notify Nearby Users", systemImage: "bell.circle.fill")
+                            Text("Notify Nearby Users")
                                 .font(.headline)
                                 .padding()
                                 .frame(maxWidth: .infinity)
                                 .background(Color.red)
                                 .foregroundColor(.white)
-                                .clipShape(Capsule())
+                                .clipShape(RoundedRectangle(cornerRadius: 14))
                         }
                     }
                 }
-                
+
                 Spacer()
             }
             .padding()
             .navigationTitle("Netra")
             .navigationBarTitleDisplayMode(.inline)
         }
-        
-        // MARK: - Sheets
+
+        // MARK: - Camera Sheet
         .sheet(isPresented: $showCamera) {
             CameraView(image: $image, flashOn: .constant(false))
         }
+
+        // MARK: - Recognition Picker
         .photosPicker(isPresented: $showRecognitionPicker, selection: $recognitionPickerItem, matching: .images)
         .onChange(of: recognitionPickerItem) { newItem in
             Task {
@@ -226,6 +269,8 @@ struct ContentView: View {
                 }
             }
         }
+
+        // MARK: - Add Person Picker
         .photosPicker(isPresented: $showAddPersonPicker, selection: $addPersonItem, matching: .images)
         .onChange(of: addPersonItem) { newItem in
             Task {
@@ -234,47 +279,34 @@ struct ContentView: View {
                     let alignedFace = WantedPersonServiceManager.shared.alignFace(from: uiImage) ?? uiImage
                     await MainActor.run {
                         personToAdd = alignedFace
-                        image = nil
+                        image = nil // Prevent recognition flow showing Compare Faces
                     }
                 }
             }
         }
         .onAppear { NotificationManager.shared.requestPermission() }
     }
-    
-    // MARK: - UI Helpers
-    private func actionButton(title: String, icon: String, colors: [Color], glow: Bool) -> some View {
-        HStack(spacing: 10) {
-            Image(systemName: icon)
-                .font(.headline)
-            Text(title)
-                .font(.headline)
-        }
-        .foregroundColor(.white)
-        .frame(maxWidth: .infinity, minHeight: 55)
-        .background(
-            LinearGradient(colors: colors, startPoint: .leading, endPoint: .trailing)
-        )
-        .clipShape(Capsule())
-        .shadow(color: colors.first!.opacity(glow ? 0.6 : 0.3), radius: glow ? 12 : 6)
-    }
-    
-    private func similarityBar(value: Float) -> some View {
-        let percent = min(max(value, 0), 1)
-        let color: Color = percent > 0.7 ? .green : (percent > 0.4 ? .orange : .red)
-        return GeometryReader { geo in
-            ZStack(alignment: .leading) {
-                RoundedRectangle(cornerRadius: 4)
-                    .fill(Color.gray.opacity(0.2))
-                RoundedRectangle(cornerRadius: 4)
-                    .fill(color)
-                    .frame(width: geo.size.width * CGFloat(percent))
+
+    // MARK: - Helpers
+    private func actionButton(title: String, icon: String, colors: [Color], glow: Bool, isChild: Bool = false) -> some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 16)
+                .fill(LinearGradient(colors: colors, startPoint: .leading, endPoint: .trailing))
+                .frame(height: isChild ? 50 : 55)
+                .shadow(color: colors.first!.opacity(0.5), radius: glow ? 15 : 6)
+                .animation(glow ? .easeInOut(duration: 1).repeatForever(autoreverses: true) : .default, value: glow)
+
+            HStack(spacing: 12) {
+                Image(systemName: icon)
+                    .font(.headline)
+                    .foregroundColor(.white)
+                Text(title)
+                    .font(.headline)
+                    .foregroundColor(.white)
             }
         }
-        .frame(height: 6)
     }
-    
-    // MARK: - Logic Helpers
+
     private func clearImage() {
         image = nil
         recognitionPickerItem = nil
@@ -283,7 +315,7 @@ struct ContentView: View {
         resultMessage = nil
         matches = []
     }
-    
+
     private func runFaceComparison(for image: UIImage) {
         isComparing = true
         FaceCompare.shared.compareFaces(image: image)
@@ -291,7 +323,7 @@ struct ContentView: View {
         resultMessage = FaceCompare.shared.resultMessage
         isComparing = false
     }
-    
+
     private func notifyUsers() {
         guard let match = matches.first else { return }
         let lat = locationManager.location?.coordinate.latitude ?? 0
@@ -299,7 +331,7 @@ struct ContentView: View {
         print("Sending notification for match at location: (\(lat), \(lng))")
         NotificationManager.shared.sendMatchNotification(with: match)
     }
-    
+
     private func savePersonToFolder(image selectedImage: UIImage) {
         let name = "Person_\(Date().timeIntervalSince1970)"
         let folderURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
@@ -311,7 +343,7 @@ struct ContentView: View {
         if let data = selectedImage.jpegData(compressionQuality: 0.9) {
             try? data.write(to: imageURL)
         }
-        
+
         if let alignedFace = WantedPersonServiceManager.shared.alignFace(from: selectedImage),
            let embedding = FaceEmbedding.shared?.embedding(for: alignedFace) {
             let normalized = WantedPersonServiceManager.shared.normalize(embedding)
@@ -320,7 +352,7 @@ struct ContentView: View {
         } else {
             print("⚠️ Could not generate embedding")
         }
-        
+
         personToAdd = nil
     }
 }
