@@ -11,7 +11,6 @@ struct ContentView: View {
     @State private var showCamera = false
     @State private var showRecognitionOptions = false
     @State private var showRecognitionPicker = false
-    @State private var showAddPersonOptions = false
     @State private var showAddPersonPicker = false
 
     @State private var recognitionPickerItem: PhotosPickerItem? = nil
@@ -26,21 +25,19 @@ struct ContentView: View {
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: 24) {
+            VStack(spacing: 8) {
 
                 // MARK: - Tagline
                 Text("Identify. Verify. Protect.")
-                    .font(.headline)
+                    .font(.subheadline)
                     .foregroundColor(.gray)
-                    .padding(.top, 8)
 
-                // MARK: - Logo at top
-                Image("app_logo") // Replace with your actual asset name
+                // MARK: - Logo
+                Image("app_logo") // Replace with your asset name
                     .resizable()
                     .scaledToFit()
                     .frame(width: 120, height: 120)
-
-                Spacer()
+                    .padding(.bottom, 6)
 
                 // MARK: - Image / Person Preview
                 ZStack(alignment: .topTrailing) {
@@ -59,7 +56,7 @@ struct ContentView: View {
                         }
                         .padding(8)
                     } else {
-                        VStack(spacing: 16) {
+                        VStack(spacing: 8) {
                             Image(systemName: "photo.on.rectangle.angled")
                                 .resizable()
                                 .scaledToFit()
@@ -69,7 +66,8 @@ struct ContentView: View {
                                 .font(.headline)
                                 .foregroundColor(.gray)
                         }
-                        .frame(maxWidth: .infinity, minHeight: 200)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 20)
                         .background(RoundedRectangle(cornerRadius: 16).fill(Color(.systemGray6)))
                         .shadow(radius: 2)
                     }
@@ -113,59 +111,29 @@ struct ContentView: View {
                 // MARK: - Action Buttons (only when no image or person selected)
                 if image == nil && personToAdd == nil {
                     VStack(spacing: 16) {
-
                         // Start Recognition
-                        VStack(spacing: 8) {
-                            Button(action: { withAnimation { showRecognitionOptions.toggle() } }) {
-                                actionButton(title: "Start Recognition",
-                                             icon: "scope",
-                                             colors: [Color.cyan.opacity(0.6), Color.cyan.opacity(0.3)],
-                                             glow: true)
-                            }
-                            if showRecognitionOptions {
-                                VStack(spacing: 8) {
-                                    Button(action: { showCamera = true }) {
-                                        actionButton(title: "Pick from Camera",
-                                                     icon: "camera.fill",
-                                                     colors: [Color.blue.opacity(0.4)],
-                                                     glow: false,
-                                                     isChild: true)
-                                            .padding(.leading, 20)
-                                    }
-                                    Button(action: { showRecognitionPicker = true }) {
-                                        actionButton(title: "Pick from Gallery",
-                                                     icon: "photo.fill.on.rectangle.fill",
-                                                     colors: [Color.orange.opacity(0.4)],
-                                                     glow: false,
-                                                     isChild: true)
-                                            .padding(.leading, 20)
-                                    }
+                        Button(action: { showRecognitionOptions.toggle() }) {
+                            actionButton(title: "Start Recognition", icon: "scope", colors: [Color.cyan.opacity(0.6), Color.cyan.opacity(0.3)], glow: true)
+                        }
+                        .onAppear { glowAnimation = true }
+
+                        if showRecognitionOptions {
+                            VStack(spacing: 10) {
+                                Button(action: { showCamera = true; showRecognitionOptions = false }) {
+                                    actionButton(title: "Pick from Camera", icon: "camera.fill", colors: [Color.blue.opacity(0.5)], glow: false, isChild: true)
+                                        .padding(.leading, 20)
                                 }
-                                .transition(.opacity.combined(with: .move(edge: .top)))
+                                Button(action: { showRecognitionPicker = true; showRecognitionOptions = false }) {
+                                    actionButton(title: "Pick from Gallery", icon: "photo.fill.on.rectangle.fill", colors: [Color.orange.opacity(0.5)], glow: false, isChild: true)
+                                        .padding(.leading, 20)
+                                }
                             }
+                            .transition(.move(edge: .top).combined(with: .opacity))
                         }
 
                         // Add Person
-                        VStack(spacing: 8) {
-                            Button(action: { withAnimation { showAddPersonOptions.toggle() } }) {
-                                actionButton(title: "Add Person in detection list",
-                                             icon: "person.crop.circle.badge.plus",
-                                             colors: [Color.purple.opacity(0.6), Color.purple.opacity(0.3)],
-                                             glow: true)
-                            }
-                            if showAddPersonOptions {
-                                VStack(spacing: 8) {
-                                    Button(action: { showAddPersonPicker = true }) {
-                                        actionButton(title: "Pick from Gallery",
-                                                     icon: "photo.on.rectangle.angled",
-                                                     colors: [Color.gray.opacity(0.3)],
-                                                     glow: false,
-                                                     isChild: true)
-                                            .padding(.leading, 20)
-                                    }
-                                }
-                                .transition(.opacity.combined(with: .move(edge: .top)))
-                            }
+                        Button(action: { showAddPersonPicker = true }) {
+                            actionButton(title: "Add Person in detection list", icon: "photo.fill", colors: [Color.purple.opacity(0.6), Color.purple.opacity(0.3)], glow: true)
                         }
                     }
                 }
@@ -290,18 +258,19 @@ struct ContentView: View {
     // MARK: - Helpers
     private func actionButton(title: String, icon: String, colors: [Color], glow: Bool, isChild: Bool = false) -> some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 16)
+            RoundedRectangle(cornerRadius: isChild ? 16 : 20)
                 .fill(LinearGradient(colors: colors, startPoint: .leading, endPoint: .trailing))
                 .frame(height: isChild ? 50 : 55)
-                .shadow(color: colors.first!.opacity(0.5), radius: glow ? 15 : 6)
+                .shadow(color: colors.first!.opacity(0.35), radius: glow ? 12 : 5, x: 0, y: 3)
                 .animation(glow ? .easeInOut(duration: 1).repeatForever(autoreverses: true) : .default, value: glow)
 
-            HStack(spacing: 12) {
+            HStack(spacing: 14) {
                 Image(systemName: icon)
                     .font(.headline)
                     .foregroundColor(.white)
                 Text(title)
                     .font(.headline)
+                    .bold()
                     .foregroundColor(.white)
             }
         }
