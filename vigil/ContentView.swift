@@ -25,7 +25,7 @@ struct ContentView: View {
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: 8) {
+            VStack(spacing: 12) {
 
                 // MARK: - Tagline
                 Text("Identify. Verify. Protect.")
@@ -37,12 +37,11 @@ struct ContentView: View {
                     .resizable()
                     .scaledToFit()
                     .frame(width: 120, height: 120)
-                    .padding(.bottom, 6)
 
-                // MARK: - Image / Person Preview
-                ZStack(alignment: .topTrailing) {
-                    if let imageToShow = personToAdd ?? image {
-                        Image(uiImage: imageToShow)
+                // MARK: - Recognition Image Preview
+                if let recognitionImage = image {
+                    ZStack(alignment: .topTrailing) {
+                        Image(uiImage: recognitionImage)
                             .resizable()
                             .scaledToFit()
                             .frame(maxHeight: 300)
@@ -55,21 +54,6 @@ struct ContentView: View {
                                 .background(Circle().fill(Color.black.opacity(0.5)))
                         }
                         .padding(8)
-                    } else {
-                        VStack(spacing: 8) {
-                            Image(systemName: "photo.on.rectangle.angled")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 80, height: 80)
-                                .foregroundColor(.gray.opacity(0.5))
-                            Text("No image selected")
-                                .font(.headline)
-                                .foregroundColor(.gray)
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 20)
-                        .background(RoundedRectangle(cornerRadius: 16).fill(Color(.systemGray6)))
-                        .shadow(radius: 2)
                     }
                 }
 
@@ -108,7 +92,7 @@ struct ContentView: View {
                     }
                 }
 
-                // MARK: - Action Buttons (only when no image or person selected)
+                // MARK: - Action Buttons (only when no recognition image or person to add)
                 if image == nil && personToAdd == nil {
                     VStack(spacing: 16) {
                         // Start Recognition
@@ -138,7 +122,7 @@ struct ContentView: View {
                     }
                 }
 
-                // MARK: - Compare Faces Button (only for recognition image)
+                // MARK: - Compare Faces Button
                 if let recognitionImage = image, personToAdd == nil {
                     Button(action: { runFaceComparison(for: recognitionImage) }) {
                         if isComparing {
