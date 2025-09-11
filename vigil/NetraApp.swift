@@ -5,13 +5,8 @@ import BackgroundTasks
 struct NetraApp: App {
     
     init() {
-        // Request notification permission at launch
         NotificationManager.shared.requestPermission()
-        
-        // Register background refresh task
         registerBackgroundTask()
-        
-        // Schedule the first refresh
         scheduleAppRefresh()
     }
     
@@ -19,19 +14,16 @@ struct NetraApp: App {
         WindowGroup {
             ContentView()
                 .onAppear {
-                    // Run initial refresh on launch without blocking UI
                     DispatchQueue.global(qos: .userInitiated).async {
-                        WantedPersonServiceManager.shared.refresh(category: .regular)
-                        WantedPersonServiceManager.shared.refresh(category: .retail)
-                        WantedPersonServiceManager.shared.refresh(category: .unsolved)
+                        WantedPersonServiceManager.shared.refresh(category: EmbeddingCategory.regular)
+                        WantedPersonServiceManager.shared.refresh(category: EmbeddingCategory.retail)
+                        WantedPersonServiceManager.shared.refresh(category: EmbeddingCategory.unsolved)
                     }
                 }
         }
     }
     
-    // MARK: - Background Task Setup
-    
-    /// Register the background refresh task with iOS
+    // MARK: - Background
     func registerBackgroundTask() {
         BGTaskScheduler.shared.register(
             forTaskWithIdentifier: "com.safetyapp.refreshWantedList",
@@ -43,42 +35,27 @@ struct NetraApp: App {
         }
     }
     
-    /// Handle the background refresh when iOS launches your app in the background
     func handleAppRefresh(task: BGAppRefreshTask) {
-        // Schedule the next refresh
         scheduleAppRefresh()
         
         let queue = OperationQueue()
         queue.maxConcurrentOperationCount = 1
-        
         let operation = BlockOperation {
-            // Refresh all categories in background
-            WantedPersonServiceManager.shared.refresh(category: .regular)
-            WantedPersonServiceManager.shared.refresh(category: .retail)
-            WantedPersonServiceManager.shared.refresh(category: .unsolved)
+            WantedPersonServiceManager.shared.refresh(category: EmbeddingCategory.regular)
+            WantedPersonServiceManager.shared.refresh(category: EmbeddingCategory.retail)
+            WantedPersonServiceManager.shared.refresh(category: EmbeddingCategory.unsolved)
         }
         
-        task.expirationHandler = {
-            // Cancel operation if system kills task
-            queue.cancelAllOperations()
-        }
-        
-        operation.completionBlock = {
-            task.setTaskCompleted(success: !operation.isCancelled)
-        }
-        
+        task.expirationHandler = { queue.cancelAllOperations() }
+        operation.completionBlock = { task.setTaskCompleted(success: !operation.isCancelled) }
         queue.addOperation(operation)
     }
     
-    /// Schedule a background refresh task
     func scheduleAppRefresh() {
         let request = BGAppRefreshTaskRequest(identifier: "com.safetyapp.refreshWantedList")
-        request.earliestBeginDate = Date(timeIntervalSinceNow: 60 * 60) // 1 hour from now
-        do {
-            try BGTaskScheduler.shared.submit(request)
-        } catch {
-            print("Could not schedule app refresh: \(error)")
-        }
+        request.earliestBeginDate = Date(timeIntervalSinceNow: 6 * 3600) // 6 hours
+        do { try BGTaskScheduler.shared.submit(request) }
+        catch { print("Could not schedule refresh: \(error)") }
     }
 }
 

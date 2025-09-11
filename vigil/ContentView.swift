@@ -5,8 +5,8 @@ import UserNotifications
 
 struct ContentView: View {
     // MARK: - States
-    @State private var image: UIImage? = nil                     // Recognition image
-    @State private var personToAdd: UIImage? = nil               // Add Person preview
+    @State private var image: UIImage? = nil
+    @State private var personToAdd: UIImage? = nil
 
     @State private var showCamera = false
     @State private var showRecognitionOptions = false
@@ -27,18 +27,20 @@ struct ContentView: View {
         NavigationStack {
             VStack(spacing: 12) {
 
-                // MARK: - Tagline
                 Text("Identify. Verify. Protect.")
                     .font(.subheadline)
                     .foregroundColor(.gray)
 
-                // MARK: - Logo
-                Image("app_logo") // Replace with your asset name
+//                Image("logo")
+//                    .resizable()
+//                    .scaledToFit()
+//                    .frame(width: 120, height: 120)
+                
+                Image(systemName: "person.crop.circle")
                     .resizable()
                     .scaledToFit()
                     .frame(width: 120, height: 120)
 
-                // MARK: - Recognition Image Preview
                 if let recognitionImage = image {
                     ZStack(alignment: .topTrailing) {
                         Image(uiImage: recognitionImage)
@@ -57,7 +59,6 @@ struct ContentView: View {
                     }
                 }
 
-                // MARK: - Add Person Preview Flow
                 if let person = personToAdd {
                     VStack(spacing: 16) {
                         Text("Add this person to detection list?")
@@ -92,37 +93,36 @@ struct ContentView: View {
                     }
                 }
 
-                // MARK: - Action Buttons (only when no recognition image or person to add)
                 if image == nil && personToAdd == nil {
                     VStack(spacing: 16) {
-                        // Start Recognition
                         Button(action: { showRecognitionOptions.toggle() }) {
-                            actionButton(title: "Start Recognition", icon: "scope", colors: [Color.cyan.opacity(0.6), Color.cyan.opacity(0.3)], glow: true)
+                            actionButton(title: "Start Recognition", icon: "scope",
+                                         colors: [Color.cyan.opacity(0.6), Color.cyan.opacity(0.3)], glow: true)
                         }
                         .onAppear { glowAnimation = true }
 
                         if showRecognitionOptions {
                             VStack(spacing: 10) {
                                 Button(action: { showCamera = true; showRecognitionOptions = false }) {
-                                    actionButton(title: "Pick from Camera", icon: "camera.fill", colors: [Color.blue.opacity(0.5)], glow: false, isChild: true)
+                                    actionButton(title: "Pick from Camera", icon: "camera.fill",
+                                                 colors: [Color.blue.opacity(0.5)], glow: false, isChild: true)
                                         .padding(.leading, 20)
                                 }
                                 Button(action: { showRecognitionPicker = true; showRecognitionOptions = false }) {
-                                    actionButton(title: "Pick from Gallery", icon: "photo.fill.on.rectangle.fill", colors: [Color.orange.opacity(0.5)], glow: false, isChild: true)
+                                    actionButton(title: "Pick from Gallery", icon: "photo.fill.on.rectangle.fill",
+                                                 colors: [Color.orange.opacity(0.5)], glow: false, isChild: true)
                                         .padding(.leading, 20)
                                 }
                             }
-                            .transition(.move(edge: .top).combined(with: .opacity))
                         }
 
-                        // Add Person
                         Button(action: { showAddPersonPicker = true }) {
-                            actionButton(title: "Add Person in detection list", icon: "photo.fill", colors: [Color.purple.opacity(0.6), Color.purple.opacity(0.3)], glow: true)
+                            actionButton(title: "Add Person in detection list", icon: "photo.fill",
+                                         colors: [Color.purple.opacity(0.6), Color.purple.opacity(0.3)], glow: true)
                         }
                     }
                 }
 
-                // MARK: - Compare Faces Button
                 if let recognitionImage = image, personToAdd == nil {
                     Button(action: { runFaceComparison(for: recognitionImage) }) {
                         if isComparing {
@@ -143,10 +143,8 @@ struct ContentView: View {
                                 .clipShape(RoundedRectangle(cornerRadius: 14))
                         }
                     }
-                    .transition(.opacity)
                 }
 
-                // MARK: - Result Message
                 if let resultMessage {
                     Text(resultMessage)
                         .padding()
@@ -156,7 +154,6 @@ struct ContentView: View {
                         .multilineTextAlignment(.center)
                 }
 
-                // MARK: - Matches List
                 if !matches.isEmpty {
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Matches")
@@ -186,16 +183,6 @@ struct ContentView: View {
                             }
                         }
                         .frame(maxHeight: 200)
-
-                        Button(action: { notifyUsers() }) {
-                            Text("Notify Nearby Users")
-                                .font(.headline)
-                                .padding()
-                                .frame(maxWidth: .infinity)
-                                .background(Color.red)
-                                .foregroundColor(.white)
-                                .clipShape(RoundedRectangle(cornerRadius: 14))
-                        }
                     }
                 }
 
@@ -205,13 +192,9 @@ struct ContentView: View {
             .navigationTitle("Netra")
             .navigationBarTitleDisplayMode(.inline)
         }
-
-        // MARK: - Camera Sheet
         .sheet(isPresented: $showCamera) {
             CameraView(image: $image, flashOn: .constant(false))
         }
-
-        // MARK: - Recognition Picker
         .photosPicker(isPresented: $showRecognitionPicker, selection: $recognitionPickerItem, matching: .images)
         .onChange(of: recognitionPickerItem) { newItem in
             Task {
@@ -221,17 +204,16 @@ struct ContentView: View {
                 }
             }
         }
-
-        // MARK: - Add Person Picker
         .photosPicker(isPresented: $showAddPersonPicker, selection: $addPersonItem, matching: .images)
         .onChange(of: addPersonItem) { newItem in
             Task {
-                if let data = try? await newItem?.loadTransferable(type: Data.self),
+                guard let item = newItem else { return }
+                if let data = try? await item.loadTransferable(type: Data.self),
                    let uiImage = UIImage(data: data) {
                     let alignedFace = WantedPersonServiceManager.shared.alignFace(from: uiImage) ?? uiImage
                     await MainActor.run {
                         personToAdd = alignedFace
-                        image = nil // Prevent recognition flow showing Compare Faces
+                        image = nil
                     }
                 }
             }
@@ -275,14 +257,6 @@ struct ContentView: View {
         matches = FaceCompare.shared.matches
         resultMessage = FaceCompare.shared.resultMessage
         isComparing = false
-    }
-
-    private func notifyUsers() {
-        guard let match = matches.first else { return }
-        let lat = locationManager.location?.coordinate.latitude ?? 0
-        let lng = locationManager.location?.coordinate.longitude ?? 0
-        print("Sending notification for match at location: (\(lat), \(lng))")
-        NotificationManager.shared.sendMatchNotification(with: match)
     }
 
     private func savePersonToFolder(image selectedImage: UIImage) {
