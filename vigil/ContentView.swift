@@ -30,11 +30,6 @@ struct ContentView: View {
                 Text("Identify. Verify. Protect.")
                     .font(.subheadline)
                     .foregroundColor(.gray)
-
-//                Image("logo")
-//                    .resizable()
-//                    .scaledToFit()
-//                    .frame(width: 120, height: 120)
                 
                 Image(systemName: "person.crop.circle")
                     .resizable()
@@ -105,12 +100,12 @@ struct ContentView: View {
                             VStack(spacing: 10) {
                                 Button(action: { showCamera = true; showRecognitionOptions = false }) {
                                     actionButton(title: "Pick from Camera", icon: "camera.fill",
-                                                 colors: [Color.blue.opacity(0.5)], glow: false, isChild: true)
+                                                 colors: [Color.cyan.opacity(0.7)], glow: false, isChild: true)
                                         .padding(.leading, 20)
                                 }
                                 Button(action: { showRecognitionPicker = true; showRecognitionOptions = false }) {
                                     actionButton(title: "Pick from Gallery", icon: "photo.fill.on.rectangle.fill",
-                                                 colors: [Color.orange.opacity(0.5)], glow: false, isChild: true)
+                                                 colors: [Color.cyan.opacity(0.7)], glow: false, isChild: true)
                                         .padding(.leading, 20)
                                 }
                             }

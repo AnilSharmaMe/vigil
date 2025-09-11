@@ -19,7 +19,7 @@ class FaceCompare {
     func compareFaces(image: UIImage, threshold: Float = 0.8) {
         guard let alignedFace = alignFace(from: image.withFixedOrientation()),
               let embedding = FaceEmbedding.shared?.embedding(for: alignedFace) else {
-            resultMessage = "❌ No face detected or embedding failed"
+            resultMessage = "❌ No face detected"
             return
         }
 
